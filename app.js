@@ -1588,19 +1588,40 @@ document.addEventListener('DOMContentLoaded', () => {
             saveCurrentInputState();
             // 2. Re-render standard layouts to ensure perfect content alignment
             renderPreview();
-            // 3. Set a small timeout to allow browser layout engines to paint the DOM completely
-            setTimeout(() => {
-                window.print();
-            }, 150);
+            // 3. Wait for browser to fully paint ALL pages before opening print dialog
+            //    Double rAF ensures the browser has committed a full paint cycle
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        window.print();
+                    }, 350);
+                });
+            });
         });
     }
 
 
-    // Intercept default Ctrl+P globally to ensure our dynamic paginated preview is saved/rendered first
+    // Double-Ctrl press — Preview Refresh shortcut
+    // 300ms ke andar 2 baar Ctrl dabane par refresh trigger hoga
+    let lastCtrlPressTime = 0;
     window.addEventListener('keydown', (e) => {
+        // Intercept Ctrl+P for print
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
             e.preventDefault();
             printPdfBtn.click();
+        }
+
+        // Double-Ctrl detection: only fire on the bare Ctrl key itself (not Ctrl+something)
+        if (e.key === 'Control' && !e.altKey && !e.shiftKey) {
+            const now = Date.now();
+            if (now - lastCtrlPressTime < 300) {
+                // Double Ctrl detected — trigger refresh
+                const syncBtn = document.getElementById('sync-preview-btn');
+                if (syncBtn) syncBtn.click();
+                lastCtrlPressTime = 0; // reset so triple press doesn't re-fire
+            } else {
+                lastCtrlPressTime = now;
+            }
         }
     });
 
