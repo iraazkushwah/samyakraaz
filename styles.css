@@ -2784,6 +2784,18 @@ body.light-mode .personality-description {
     color: #334155;
 }
 
+#smart-shrink-btn {
+    border: 1px dashed var(--ui-accent);
+    color: var(--ui-accent);
+    background-color: rgba(99, 102, 241, 0.08);
+    transition: var(--transition-smooth);
+}
+#smart-shrink-btn:hover {
+    background-color: var(--ui-accent);
+    color: white;
+    transform: translateY(-1px);
+}
+
 
 
 

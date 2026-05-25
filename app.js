@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const clearAllBtn = document.getElementById('clear-all-btn');
     const printPdfBtn = document.getElementById('print-pdf-btn');
+    const smartShrinkBtn = document.getElementById('smart-shrink-btn');
     
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
@@ -1283,6 +1284,116 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Smart Shrink (Overflow Fixer) Click Listener
+    if (smartShrinkBtn) {
+        smartShrinkBtn.addEventListener('click', () => {
+            const originalPageCount = pagesData.length;
+            
+            if (originalPageCount <= 2) {
+                alert("Smart Shrink tab tab hi kaam karega jab aapke paas multiple pages hon!");
+                return;
+            }
+
+            const originalFontSize = contentFontSize;
+            const originalLineSpacing = parseFloat(globalLineSpacingSelect.value || '1.45');
+            
+            const lastPageText = pagesData[originalPageCount - 1].text.trim();
+            const characterCount = lastPageText.length;
+            const lineCount = lastPageText.split('\n').filter(l => l.trim()).length;
+
+            if (characterCount > 600 || lineCount > 6) {
+                const proceed = confirm(`Aakhiri page par content thoda zyada hai (${lineCount} lines, ${characterCount} chars). Ise pichle page me fit karne ke liye text ka size kaafi chhota karna pad sakta hai. Kya aap fir bhi koshish karna chahte hain?`);
+                if (!proceed) return;
+            }
+
+            // Search candidates: subtle line-height adjustments first, then font-size decrements
+            const candidates = [];
+            
+            // 1. Try subtle line-height reductions on original font-size
+            for (let ls = originalLineSpacing - 0.03; ls >= 1.3; ls -= 0.03) {
+                candidates.push({ fs: originalFontSize, ls: Math.round(ls * 100) / 100 });
+            }
+
+            // 2. Try smaller font-sizes in steps of 0.2px down to 11px
+            for (let fs = originalFontSize - 0.2; fs >= 11; fs -= 0.2) {
+                const roundedFs = Math.round(fs * 100) / 100;
+                candidates.push({ fs: roundedFs, ls: originalLineSpacing });
+                
+                if (originalLineSpacing > 1.4) {
+                    candidates.push({ fs: roundedFs, ls: 1.4 });
+                }
+                candidates.push({ fs: roundedFs, ls: 1.35 });
+                candidates.push({ fs: roundedFs, ls: 1.3 });
+            }
+
+            let success = false;
+            let bestFs = originalFontSize;
+            let bestLs = originalLineSpacing;
+
+            // Helper function to safely set spacing value in select control
+            const setSelectValue = (selectEl, val) => {
+                let optionExists = Array.from(selectEl.options).some(opt => parseFloat(opt.value) === val);
+                if (!optionExists) {
+                    const tempOpt = document.createElement('option');
+                    tempOpt.value = val.toString();
+                    tempOpt.textContent = `Custom (${val})`;
+                    tempOpt.id = 'temp-spacing-option';
+                    selectEl.appendChild(tempOpt);
+                }
+                selectEl.value = val.toString();
+            };
+
+            // Run iterations
+            for (const candidate of candidates) {
+                contentFontSize = candidate.fs;
+                setSelectValue(globalLineSpacingSelect, candidate.ls);
+                
+                document.documentElement.style.setProperty('--content-font-size', `${contentFontSize}px`);
+                document.documentElement.style.setProperty('--content-line-height', candidate.ls.toString());
+                cachedMaxContentHeight = null; // force recalculate heights
+                
+                renderPreview();
+
+                if (pagesData.length < originalPageCount) {
+                    success = true;
+                    bestFs = candidate.fs;
+                    bestLs = candidate.ls;
+                    break;
+                }
+            }
+
+            // Clear any unused temporary options from select dropdown
+            const cleanTempOptions = (selectEl, activeVal) => {
+                Array.from(selectEl.options).forEach(opt => {
+                    if (opt.id === 'temp-spacing-option' && parseFloat(opt.value) !== activeVal) {
+                        selectEl.removeChild(opt);
+                    }
+                });
+            };
+
+            if (success) {
+                fontSizeValSpan.textContent = `${bestFs}px`;
+                cleanTempOptions(globalLineSpacingSelect, bestLs);
+                renderPreview();
+                saveWorkspaceToLocalStorage();
+                alert(`🪄 Smart Shrink Kamyab rha!\n\nPages: ${originalPageCount} -> ${pagesData.length}\nFont Size: ${bestFs}px\nLine Spacing: ${bestLs}`);
+            } else {
+                // Restore original settings
+                contentFontSize = originalFontSize;
+                setSelectValue(globalLineSpacingSelect, originalLineSpacing);
+                cleanTempOptions(globalLineSpacingSelect, originalLineSpacing);
+                
+                document.documentElement.style.setProperty('--content-font-size', `${originalFontSize}px`);
+                document.documentElement.style.setProperty('--content-line-height', originalLineSpacing.toString());
+                fontSizeValSpan.textContent = `${originalFontSize}px`;
+                cachedMaxContentHeight = null;
+                
+                renderPreview();
+                alert("Koshish ki gayi, lekin font size ko 11px se chhota kiye bina pichle page me fit karna mumkin nahi ho saka.");
+            }
+        });
+    }
+
     // Highly robust PDF print button action
     printPdfBtn.addEventListener('click', () => {
         // 1. Save current state of inputs
