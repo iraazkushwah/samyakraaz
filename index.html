@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samyak - by Raaz Kushwah</title>
+    <!-- Google Fonts: Poppins (modern UI), Noto Sans Devanagari (Hindi Body), Rozha One (Calligraphy/Display Serif), Martel (Traditional serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Martel:wght@400;700;900&family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Serif+Devanagari:wght@400;600;700;900&family=Poppins:wght@300;400;500;600;700&family=Rozha+One&family=Yatra+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        
+        <!-- Left Panel: Page Manager & Active Editor -->
+        <aside class="editor-panel">
+            <header class="editor-header">
+                <div class="logo-area">
+                    <span class="logo-icon">📚</span>
+                    <div class="logo-text">
+                        <h1>सम्यक्</h1>
+                        <p>by Raaz Kushwah</p>
+                    </div>
+                </div>
+                <div class="header-global-actions">
+                    <div class="header-theme-container" title="Visual Theme (दस्तावेज़ की थीम)">
+                        <button class="header-action-btn" type="button" tabindex="-1">🎨</button>
+                        <select id="doc-theme" class="header-theme-select">
+                            <option value="maroon-gold">Samyak Maroon & Gold</option>
+                            <option value="royal-navy">Royal Navy & Gold</option>
+                            <option value="emerald-cream">Emerald Forest & Cream</option>
+                            <option value="midnight-gold">Midnight Slate & Gold</option>
+                        </select>
+                    </div>
+                    <button id="theme-toggle-btn" class="header-action-btn" title="Toggle Editor Theme (थीम बदलें)">🌙</button>
+                    <button id="import-project-btn" class="header-action-btn" title="Import Project (.raaz) (फ़ाइल लोड करें)">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                    </button>
+                    <button id="export-project-btn" class="header-action-btn" title="Export Project (.raaz) (फ़ाइल सेव करें)">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                    </button>
+                    <button id="compile-magazines-btn" class="header-action-btn" title="Compile Monthly Magazine (मासिक मैगज़ीन कंपाइल करें)">🛠️</button>
+                    <input type="file" id="import-project-file" accept=".raaz" style="display: none;">
+                </div>
+                <div class="badge-status">Workspace Active</div>
+            </header>
+
+            <!-- Sidebar Tab Navigation (Premium Header Slider) -->
+            <nav class="sidebar-tabs-nav">
+                <button id="tab-pages-btn" class="sidebar-tab-btn active" data-target="panel-pages">
+                    <span class="tab-icon">📂</span> Pages (पेज)
+                </button>
+                <button id="tab-editor-btn" class="sidebar-tab-btn" data-target="panel-editor">
+                    <span class="tab-icon">✍️</span> Editor (लेखन)
+                </button>
+                <button id="tab-settings-btn" class="sidebar-tab-btn" data-target="panel-settings">
+                    <span class="tab-icon">📐</span> Settings (सेटिंग्स)
+                </button>
+                <button id="tab-design-btn" class="sidebar-tab-btn" data-target="panel-design">
+                    <span class="tab-icon">🎨</span> Design (डिज़ाइन)
+                </button>
+            </nav>
+
+            <!-- Dynamic Sidebar Panels Container -->
+            <div class="sidebar-panels-container">
+                
+                <!-- Tab Panel 1: Pages (Document Pages Grid) -->
+                <div id="panel-pages" class="sidebar-panel active">
+                    <section class="page-manager-section">
+                        <h3 class="section-title">Document Pages</h3>
+                        <div class="page-tabs-wrapper">
+                            <div id="page-tabs-list" class="page-tabs-list">
+                                <!-- Dynamic page tabs will be injected here by JS: Cover, Page 2... -->
+                            </div>
+                            <div class="page-actions-bar">
+                                <button id="add-page-btn" class="btn-tab-action" title="Add a new page">➕ Add Page</button>
+                                <button id="delete-page-btn" class="btn-tab-action btn-danger" title="Delete active page">❌ Delete Page</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Tab Panel 2: Editor (Active Content Editing Area) -->
+                <div id="panel-editor" class="sidebar-panel">
+                    <section class="editor-core">
+                        <!-- Zone 1: Metadata settings (Visible only when Cover Page is selected) -->
+                        <div id="cover-editor-zone" class="editor-zone">
+                            <h3 class="section-title">Cover Page Settings</h3>
+                            <div class="settings-grid">
+                                <div class="input-group full-width">
+                                    <label for="doc-title">Main Banner Title (मुख्य नाम)</label>
+                                    <input type="text" id="doc-title" value="सम्यक्">
+                                </div>
+                                <div class="input-group full-width">
+                                    <label for="doc-tagline">Tagline Banner (टैगलाइन)</label>
+                                    <input type="text" id="doc-tagline" value="कोचिंग नहीं क्रांति">
+                                </div>
+                                <div class="input-group full-width">
+                                    <label for="doc-subtitle">Subtitle / Date (उपशीर्षक / तिथि)</label>
+                                    <input type="text" id="doc-subtitle" value="राजस्थान समसामयिकी : 1-10 मई">
+                                </div>
+                            </div>
+                            <div class="cover-editor-helper">
+                                <p>💡 <strong>Cover Page Note:</strong> Cover Page ki table of contents (विषयवस्तु) baaki pages me likhe gaye main headers (# Section) ko scan karke automatic generate and update hogi.</p>
+                            </div>
+                        </div>
+
+                        <!-- Zone 1.5: Last Page settings (Visible only when End Page is selected) -->
+                        <div id="last-editor-zone" class="editor-zone">
+                            <h3 class="section-title">End Page Settings</h3>
+                            <div class="settings-grid">
+                                <div class="input-group full-width">
+                                    <label for="last-title">Main Heading (मुख्य नाम)</label>
+                                    <input type="text" id="last-title" value="THANK YOU">
+                                </div>
+                                <div class="input-group full-width">
+                                    <label for="last-subtitle">Sub Heading (उपशीर्षक)</label>
+                                    <input type="text" id="last-subtitle" value="सम्यक्">
+                                </div>
+                                <div class="input-group full-width">
+                                    <label for="last-tagline">Description / Tagline (विवरण)</label>
+                                    <input type="text" id="last-tagline" value="कोचिंग नहीं क्रांति">
+                                </div>
+                            </div>
+                            <div class="cover-editor-helper">
+                                <p>💡 <strong>End Page Note:</strong> Yahan likha hua text document ke aakhiri page (Thank You Page) par live update hoga.</p>
+                            </div>
+                        </div>
+
+                        <!-- Zone 2: Content Page Editor (Visible for standard pages) -->
+                        <div id="content-editor-zone" class="editor-zone active">
+                            <div class="page-template-bar">
+                                <span>Page Template (पेज वातावरण):</span>
+                                <select id="page-template-select">
+                                    <option value="" disabled selected>Select Page Template...</option>
+                                    <option value="standard">Standard Content (सामान्य लेख)</option>
+                                    <option value="personality">Personality Feature (चर्चित व्यक्तित्व)</option>
+                                    <option value="stats-table">Comparison & Stats (तुलना व आँकड़े)</option>
+                                    <option value="facts-grid">Quick Facts Grid (तथ्य ग्रिड)</option>
+                                    <option value="announcement">Highlights & Alert (विशेष सूचना)</option>
+                                    <option value="blank">Blank Page (खाली पेज)</option>
+                                </select>
+                            </div>
+                            <div class="page-layout-bar">
+                                <span>Page Layout (पेज लेआउट):</span>
+                                <div style="display: flex; gap: 4px; align-items: center;">
+                                    <select id="page-layout-select">
+                                        <option value="single">Single Column (एक कॉलम)</option>
+                                        <option value="two-column">Two Columns (दो कॉलम)</option>
+                                    </select>
+                                    <button id="apply-layout-all-btn" class="search-action-btn" style="font-size: 9px; padding: 3px 6px;" title="Apply this layout to all content pages (सभी पेजों पर लागू करें)">Apply to All</button>
+                                </div>
+                            </div>
+                            <div class="editor-toolbar">
+                                <button class="tool-btn" id="btn-section" data-prefix="# " title="Add Section Header (# Section)">#</button>
+                                <button class="tool-btn" id="btn-topic" data-prefix="## 🔶 " title="Add Topic Title (🔶 Topic)">🔶</button>
+                                <button class="tool-btn" id="btn-bullet" data-prefix="• " title="Add Bullet Point (• Bullet)">•</button>
+                                <button class="tool-btn" id="btn-note" data-prefix="> " title="Add Highlight Box (💡 Note)">💡</button>
+                                <button class="tool-btn" id="highlight-green-btn" data-prefix="==green|" data-suffix="==" title="Highlight (Green)">G</button>
+                                <button class="tool-btn" id="highlight-pink-btn" data-prefix="==pink|" data-suffix="==" title="Highlight (Pink)">P</button>
+                                <button class="tool-btn" id="btn-pagebreak" data-prefix="&#10;[pagebreak]&#10;" title="Insert Page Break">📄</button>
+                                <button class="tool-btn" id="insert-image-btn" title="Insert Photo/Image">📷</button>
+                                <button class="tool-btn" id="insert-table-btn" title="Insert Table (तालिका जोड़ें)">📊</button>
+                                <button class="tool-btn" id="btn-search-toggle" title="Find and Replace (ढूंढे और बदलें)">🔍</button>
+                                <button class="tool-btn" id="btn-help-shortcuts" title="Shortcuts & Formatting Help (शॉर्टकट और फॉर्मेटिंग सहायता)">❓</button>
+                                <input type="file" id="editor-image-upload" accept="image/*" style="display: none;">
+                            </div>
+                            <div id="search-replace-panel" class="search-replace-panel" style="display: none;">
+                                <div class="search-row">
+                                    <input type="text" id="find-input" placeholder="Find text (खोजें)...">
+                                    <input type="text" id="replace-input" placeholder="Replace with (बदलें)...">
+                                </div>
+                                <div class="search-row actions">
+                                    <button id="find-btn" class="search-action-btn">Find Next</button>
+                                    <button id="replace-btn" class="search-action-btn">Replace</button>
+                                    <button id="replace-all-btn" class="search-action-btn">Replace All</button>
+                                    <span id="search-status" class="search-status"></span>
+                                </div>
+                            </div>
+                            <div class="textarea-wrapper">
+                                <textarea id="page-content-input" spellcheck="false" placeholder="Active page ka text yahan paste karein ya likhna shuru karein..."></textarea>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Tab Panel 3: Settings (Typography & Custom Spacings) -->
+                <div id="panel-settings" class="sidebar-panel">
+                    <section class="settings-section">
+                        <div class="global-page-options">
+                            <h4 class="options-group-title">📐 Typography & Spacing Options</h4>
+                            <div class="options-grid">
+                                <div class="option-item">
+                                    <label><span class="opt-icon">✍️</span> Font Style (शैली):</label>
+                                    <select id="global-font-style" class="opt-select">
+                                        <option value="modern-sans">Samyak Signature (Yatra & Mukta)</option>
+                                        <option value="poppins-sans">Modern Sans (Poppins & Noto Sans)</option>
+                                        <option value="traditional-serif">Traditional Serif (Martel & Noto Serif)</option>
+                                        <option value="hybrid-style">Hybrid (Rozha One & Noto Sans)</option>
+                                    </select>
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🔍</span> Text Size (आकार):</label>
+                                    <div class="font-adjuster">
+                                        <button id="font-decrease" class="font-btn" title="Decrease Font Size">-</button>
+                                        <span id="font-size-val">13.5px</span>
+                                        <button id="font-increase" class="font-btn" title="Increase Font Size">+</button>
+                                    </div>
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">⚖️</span> Font Weight (मोटाई):</label>
+                                    <select id="global-font-weight" class="opt-select">
+                                        <option value="500">Normal (500)</option>
+                                        <option value="600">Medium (600)</option>
+                                        <option value="700" selected>Bold (700)</option>
+                                        <option value="800">Extra Bold (800)</option>
+                                    </select>
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">↔️</span> Letter Spacing (दूरी):</label>
+                                    <select id="global-letter-spacing" class="opt-select">
+                                        <option value="-0.2px">Compact (-0.2px)</option>
+                                        <option value="0px" selected>Normal (0px)</option>
+                                        <option value="0.5px">Wide (0.5px)</option>
+                                        <option value="1px">Extra Wide (1px)</option>
+                                    </select>
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">↕️</span> Line Spacing (लाइन गैप):</label>
+                                    <select id="global-line-spacing" class="opt-select">
+                                        <option value="1.3">Compact (1.3)</option>
+                                        <option value="1.45" selected>Normal (1.45)</option>
+                                        <option value="1.6">Relaxed (1.6)</option>
+                                        <option value="1.8">Loose (1.8)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 💧 Watermark Options (वाटरमार्क) -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">💧 Watermark Options (वाटरमार्क)</h4>
+                            <div class="options-grid">
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">🏷️</span> Watermark Type:</label>
+                                    <select id="watermark-type" class="opt-select">
+                                        <option value="none" selected>None (कोई नहीं)</option>
+                                        <option value="text">Text (पाठ)</option>
+                                        <option value="image">Image/Logo (चित्र)</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Text Watermark Settings -->
+                                <div id="watermark-text-group" class="option-item full-width-opt" style="display: none;">
+                                    <label><span class="opt-icon">📝</span> Watermark Text:</label>
+                                    <input type="text" id="watermark-text" class="opt-select" value="सम्यक्" style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff;">
+                                </div>
+
+                                <!-- Image Watermark Settings -->
+                                <div id="watermark-image-group" class="option-item full-width-opt" style="display: none;">
+                                    <label><span class="opt-icon">📷</span> Upload Logo Image:</label>
+                                    <input type="file" id="watermark-image-file" accept="image/*" class="opt-select" style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff; padding: 4px 8px;">
+                                    <p style="font-size: 9px; color: var(--ui-text-muted); margin-top: 4px;">💡 Select any image to use as a logo watermark.</p>
+                                </div>
+
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📍</span> Position (स्थिति):</label>
+                                    <select id="watermark-position" class="opt-select">
+                                        <option value="center" selected>Center (केंद्र)</option>
+                                        <option value="top-left">Top Left</option>
+                                        <option value="top-right">Top Right</option>
+                                        <option value="bottom-left">Bottom Left</option>
+                                        <option value="bottom-right">Bottom Right</option>
+                                    </select>
+                                </div>
+
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🔄</span> Rotation (घूर्णन):</label>
+                                    <select id="watermark-rotation" class="opt-select">
+                                        <option value="-45" selected>Diagonal (-45°)</option>
+                                        <option value="0">Straight (0°)</option>
+                                        <option value="45">Diagonal (45°)</option>
+                                        <option value="-90">Vertical (-90°)</option>
+                                    </select>
+                                </div>
+
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🏁</span> Opacity (<span id="watermark-opacity-val">15%</span>):</label>
+                                    <input type="range" id="watermark-opacity" min="0" max="100" value="15" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📐</span> Size / Scale (<span id="watermark-size-val">60px</span>):</label>
+                                    <input type="range" id="watermark-size" min="10" max="200" value="60" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+
+                                <div id="watermark-color-group" class="option-item full-width-opt" style="display: none;">
+                                    <label><span class="opt-icon">🎨</span> Text Color:</label>
+                                    <input type="color" id="watermark-color" value="#000000" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 📱 Social Links Footer (सोशल लिंक्स फ़ुटर) -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">📱 Social Links Footer (सोशल लिंक्स फ़ुटर)</h4>
+                            <div class="options-grid">
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">✈️</span> Telegram (चैनल हैंडल):</label>
+                                    <input type="text" id="footer-telegram" class="opt-select" value="@samyak" style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff;">
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">▶️</span> YouTube (चैनल नाम):</label>
+                                    <input type="text" id="footer-youtube" class="opt-select" value="Samyak Coaching" style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff;">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📐</span> Font Size (<span id="footer-social-size-val">11px</span>):</label>
+                                    <input type="range" id="footer-social-size" min="8" max="18" value="11" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📍</span> Placement (संरेखण):</label>
+                                    <select id="footer-social-placement" class="opt-select">
+                                        <option value="split" selected>Split (Left-Right)</option>
+                                        <option value="center">Center (मध्य)</option>
+                                        <option value="left">Left (बायें)</option>
+                                        <option value="right">Right (दायें)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Tab Panel 4: Custom Design Panel (डिज़ाइन) -->
+                <div id="panel-design" class="sidebar-panel">
+                    <section class="settings-section">
+                        <!-- Group 1: Main Heading (Section Bar) Customizer -->
+                        <div class="global-page-options">
+                            <h4 class="options-group-title">🏷️ Main Heading (मुख्य हेडिंग्स)</h4>
+                            <div class="options-grid">
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🎨</span> BG Color:</label>
+                                    <input type="color" id="design-section-bg" value="#850f0f" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">✨</span> Accent Color:</label>
+                                    <input type="color" id="design-section-accent" value="#1d6ea5" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">🎨</span> Text Color:</label>
+                                    <input type="color" id="design-section-text" value="#ffffff" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">📐</span> Font Size (<span id="design-section-size-val">18px</span>):</label>
+                                    <input type="range" id="design-section-size" min="12" max="32" value="18" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">📍</span> Placement (संरेखण):</label>
+                                    <select id="design-section-align" class="opt-select">
+                                        <option value="left" selected>Left Align (बायें)</option>
+                                        <option value="center">Center Align (मध्य)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 2: Topic Heading (Topic Title) Customizer -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">🔸 Topic Heading (विषय हेडिंग्स)</h4>
+                            <div class="options-grid">
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🎨</span> Text Color:</label>
+                                    <input type="color" id="design-topic-text" value="#1d6ea5" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🎨</span> Border Color:</label>
+                                    <input type="color" id="design-topic-border" value="#c5a353" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📏</span> Border Style:</label>
+                                    <select id="design-topic-border-style" class="opt-select">
+                                        <option value="dashed" selected>Dashed (टूटी रेखा)</option>
+                                        <option value="solid">Solid (ठोस रेखा)</option>
+                                        <option value="double">Double (दोहरी रेखा)</option>
+                                        <option value="none">None (कोई नहीं)</option>
+                                    </select>
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">↕️</span> Spacing (margin):</label>
+                                    <select id="design-topic-margin" class="opt-select">
+                                        <option value="4px 2px" selected>Normal</option>
+                                        <option value="8px 4px">Wide</option>
+                                        <option value="12px 6px">Relaxed</option>
+                                        <option value="2px 1px">Compact</option>
+                                    </select>
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📐</span> Font Size (<span id="design-topic-size-val">15px</span>):</label>
+                                    <input type="range" id="design-topic-size" min="10" max="24" value="15" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">➖</span> Border Thickness (<span id="design-topic-thick-val">1.5px</span>):</label>
+                                    <input type="range" id="design-topic-thick" min="1" max="6" value="1.5" step="0.5" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">📍</span> Placement (संरेखण):</label>
+                                    <select id="design-topic-align" class="opt-select">
+                                        <option value="flex-start" selected>Left Align (बायें)</option>
+                                        <option value="center">Center Align (मध्य)</option>
+                                        <option value="flex-end">Right Align (दायें)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 3: Page Borders & Ornaments Customizer -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">🖼️ Page Borders & Decor (पेज बॉर्डर)</h4>
+                            <div class="options-grid">
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🎨</span> Border Color:</label>
+                                    <input type="color" id="design-inner-border" value="#c5a353" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🎨</span> Corner Color:</label>
+                                    <input type="color" id="design-corner-color" value="#c5a353" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">➖</span> Border Thickness (<span id="design-border-thick-val">1px</span>):</label>
+                                    <input type="range" id="design-border-thick" min="0" max="5" value="1" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📐</span> Corner Bracket Size (<span id="design-corner-size-val">22px</span>):</label>
+                                    <input type="range" id="design-corner-size" min="10" max="40" value="22" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 3.5: Two-Column Divider Customizer -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">⚖️ Column Divider (दो-कॉलम विभाजक)</h4>
+                            <div class="options-grid">
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🎨</span> Divider Color:</label>
+                                    <input type="color" id="design-divider-color" value="#c5a353" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📏</span> Divider Style:</label>
+                                    <select id="design-divider-style" class="opt-select">
+                                        <option value="dashed" selected>Dashed (टूटी रेखा)</option>
+                                        <option value="solid">Solid (ठोस रेखा)</option>
+                                        <option value="double">Double (दोहरी रेखा)</option>
+                                        <option value="dotted">Dotted (बिंदुदार रेखा)</option>
+                                        <option value="none">None (कोई नहीं)</option>
+                                    </select>
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">➖</span> Thickness (<span id="design-divider-thick-val">1.5px</span>):</label>
+                                    <input type="range" id="design-divider-thick" min="0" max="6" value="1.5" step="0.5" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 3.6: End Star Divider Customizer -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">✦ End Star Divider (स्टार विभाजक)</h4>
+                            <div class="options-grid">
+                                <div class="option-item">
+                                    <label><span class="opt-icon">⭐</span> Star Symbol:</label>
+                                    <select id="design-end-star-symbol" class="opt-select">
+                                        <option value="✦" selected>Diamonds (✦)</option>
+                                        <option value="★">Classic Stars (★)</option>
+                                        <option value="✿">Flowers (✿)</option>
+                                        <option value="*">Asterisks (*)</option>
+                                    </select>
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🎨</span> Star Color:</label>
+                                    <input type="color" id="design-end-star-color" value="#c5a353" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item">
+                                    <label><span class="opt-icon">📏</span> Star Size (<span id="design-end-star-size-val">18px</span>):</label>
+                                    <input type="range" id="design-end-star-size" min="12" max="36" value="18" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                                <div class="option-item" style="display: flex; align-items: center; justify-content: space-between; padding-top: 25px; box-sizing: border-box;">
+                                    <label style="margin-bottom: 0; cursor: pointer; display: flex; align-items: center; gap: 8px; user-select: none;">
+                                        <input type="checkbox" id="design-end-star-pulse" checked style="width: 16px; height: 16px; accent-color: var(--ui-accent); cursor: pointer; margin: 0;">
+                                        <span>Pulse Animation</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 4: Pagination (Page Number) Customizer -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">🔢 Pagination & Footer (पेज संख्या)</h4>
+                            <div class="options-grid">
+                                <div class="option-item">
+                                    <label><span class="opt-icon">🎨</span> Number Color:</label>
+                                    <input type="color" id="design-page-num-color" value="#850f0f" style="width: 100%; height: 32px; border: 1px solid var(--ui-border); background: none; cursor: pointer; border-radius: 4px;">
+                                </div>
+                                <div class="option-item" style="display: none;">
+                                    <label><span class="opt-icon">📍</span> Placement:</label>
+                                    <select id="design-page-num-place" class="opt-select">
+                                        <option value="bottom-center" selected>Bottom Center (नीचे मध्य)</option>
+                                        <option value="bottom-right">Bottom Right (नीचे दायें)</option>
+                                        <option value="top-center">Top Center (ऊपर मध्य)</option>
+                                        <option value="top-right">Top Right (ऊपर दायें)</option>
+                                    </select>
+                                </div>
+                                <div class="option-item full-width-opt" style="display: none;">
+                                    <label><span class="opt-icon">📝</span> Prefix Text (पेज उपसर्ग):</label>
+                                    <input type="text" id="design-page-num-prefix" class="opt-select" value="पेज - " style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff;">
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">📐</span> Font Size (<span id="design-page-num-size-val">15px</span>):</label>
+                                    <input type="range" id="design-page-num-size" min="10" max="24" value="15" style="width: 100%; accent-color: var(--ui-accent);">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 5: Global Header Logo -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">🖼️ Global Header Logo (हेडर लोगो)</h4>
+                            <div class="options-grid">
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">📷</span> Upload Header Logo:</label>
+                                    <input type="file" id="header-logo-file" accept="image/*" class="opt-select" style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff; padding: 4px 8px;">
+                                    <p style="font-size: 9px; color: var(--ui-text-muted); margin-top: 4px;">💡 Select an image to display as a logo on the left of every page header.</p>
+                                </div>
+                                <div id="header-logo-preview-group" class="option-item full-width-opt" style="display: none;">
+                                    <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+                                        <img id="header-logo-preview" src="" style="max-height: 32px; max-width: 80px; object-fit: contain; border-radius: 4px; border: 1px solid var(--ui-border); background-color: #fff; padding: 2px;">
+                                        <button type="button" id="remove-header-logo-btn" class="btn-remove-preview" style="padding: 2px 8px; font-size: 10px;">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <footer class="editor-footer">
+                <div class="stats">
+                    <span id="active-page-label">Editing: Cover Page</span>
+                    <span id="word-count">Words: 0</span>
+                </div>
+                <div class="action-buttons">
+                    <button id="clear-all-btn" class="btn btn-secondary btn-clear" title="Clear all content and start fresh">🗑️ Clear Content</button>
+                    <button id="print-pdf-btn" class="btn btn-primary">
+                        <span class="btn-icon">🖨️</span> Save as PDF
+                    </button>
+                </div>
+            </footer>
+        </aside>
+
+        <!-- Resize Handle Divider -->
+        <div class="resize-handle" id="sidebar-resize-handle" title="Drag to resize editor panel">
+            <button id="sidebar-toggle-btn" class="sidebar-toggle-btn" title="Collapse Sidebar">◀</button>
+        </div>
+
+        <!-- Right Panel: Live A4 Preview Canvas -->
+        <main class="preview-panel">
+            <div class="preview-header">
+                <h2>Live A4 Print Preview</h2>
+                <div class="preview-zoom-controls">
+                    <button id="zoom-out" class="zoom-btn" title="Zoom Out">-</button>
+                    <span id="zoom-level">100%</span>
+                    <button id="zoom-in" class="zoom-btn" title="Zoom In">+</button>
+                </div>
+            </div>
+            
+            <div class="canvas-wrapper">
+                <!-- A4 Pages Container -->
+                <div id="pages-container" class="pages-container">
+                    <!-- Dynamic A4 pages will be injected here by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Image Insertion Modal -->
+    <div id="image-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📷 Insert Photo / Image (चित्र जोड़ें)</h3>
+                <button id="close-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Source Tabs -->
+                <div class="modal-tabs" style="display: flex; gap: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--ui-border); padding-bottom: 8px;">
+                    <button type="button" id="modal-tab-upload" class="modal-tab-btn active" style="flex: 1; background: none; border: none; color: #fff; border-bottom: 2px solid var(--ui-accent); padding: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Upload File (अपलोड)</button>
+                    <button type="button" id="modal-tab-url" class="modal-tab-btn" style="flex: 1; background: none; border: none; color: var(--ui-text-muted); border-bottom: 2px solid transparent; padding: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Web URL (वेब लिंक)</button>
+                </div>
+                
+                <!-- Tab Content 1: Upload -->
+                <div id="modal-content-upload">
+                    <div id="modal-upload-zone" class="upload-zone">
+                        <span class="upload-icon">📤</span>
+                        <p>Click to upload an image (चित्र चुनें)</p>
+                        <span class="file-name-label" id="selected-file-name">No file selected</span>
+                        <input type="file" id="modal-image-file" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+
+                <!-- Tab Content 2: URL -->
+                <div id="modal-content-url" style="display: none;">
+                    <div class="input-group">
+                        <label for="image-url-input">Image Web URL (वेब लिंक)</label>
+                        <input type="text" id="image-url-input" placeholder="https://example.com/photo.jpg">
+                    </div>
+                </div>
+                
+                <!-- Preview area -->
+                <div id="modal-image-preview-container" class="image-preview-container" style="display: none; margin-top: 10px;">
+                    <img id="modal-image-preview" src="" alt="Preview">
+                    <button type="button" id="remove-preview-btn" class="btn-remove-preview">Remove</button>
+                </div>
+
+                <!-- Input Group: Caption -->
+                <div class="input-group" style="margin-top: 10px;">
+                    <label for="image-caption">Image Caption (शीर्षक)</label>
+                    <input type="text" id="image-caption" placeholder="Enter photo caption (शीर्षक लिखें)">
+                </div>
+
+                <!-- Input Group: Width & Alignment in same row -->
+                <div class="settings-grid" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <div class="input-group">
+                        <label for="image-width">Width / Size (आकार)</label>
+                        <select id="image-width">
+                            <option value="30%">Small (30%)</option>
+                            <option value="50%">Medium (50%)</option>
+                            <option value="75%">Large (75%)</option>
+                            <option value="90%" selected>Extra Large (90%)</option>
+                            <option value="100%">Full Width (100%)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="image-align">Alignment (संरेखण)</label>
+                        <select id="image-align">
+                            <option value="left">Left</option>
+                            <option value="center" selected>Center</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancel-image-btn" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="insert-confirm-btn" class="btn btn-primary" disabled>Insert Image</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Insertion Modal -->
+    <div id="table-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 Insert Table (तालिका जोड़ें)</h3>
+                <button id="close-table-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="input-group">
+                        <label for="table-cols">Columns (कॉलम की संख्या)</label>
+                        <input type="number" id="table-cols" min="1" max="10" value="3">
+                    </div>
+                    <div class="input-group">
+                        <label for="table-rows">Rows (रो की संख्या)</label>
+                        <input type="number" id="table-rows" min="1" max="20" value="3">
+                    </div>
+                </div>
+                
+                <div class="settings-grid" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <div class="input-group">
+                        <label for="table-width-select">Table Width (चौड़ाई)</label>
+                        <select id="table-width-select">
+                            <option value="50%">Compact (50%)</option>
+                            <option value="75%">Medium (75%)</option>
+                            <option value="90%">Large (90%)</option>
+                            <option value="100%" selected>Full Width (100%)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="table-align-select">Alignment (संरेखण)</label>
+                        <select id="table-align-select">
+                            <option value="left">Left</option>
+                            <option value="center" selected>Center</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="cover-editor-helper" style="margin-top: 10px; border-left-color: var(--secondary-color);">
+                    <p>💡 <strong>Table Generation Note:</strong> Table insert karne ke baad aap editor me data ko edit kar sakte hain. Column headers default text se populate honge.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancel-table-btn" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="insert-table-confirm-btn" class="btn btn-primary">Insert Table</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Magazine Compiler Modal -->
+    <div id="compiler-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🛠️ Smart Magazine Compiler (मासिक मैगज़ीन कंपाइलर)</h3>
+                <button id="close-compiler-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="cover-editor-helper" style="margin-bottom: 15px;">
+                    <p>💡 <strong>Compiler Info:</strong> Alag-alag parts (e.g. Part 1, 2, 3) ki `.raaz` files upload karein. Compiler inke headings aur content ko smart-merge karke ek single monthly magazine generate kar dega.</p>
+                </div>
+                
+                <div class="settings-grid" style="gap: 15px;">
+                    <div class="input-group full-width" style="grid-column: span 2;">
+                        <label>File 1 (Part 1 / Days 1-10):</label>
+                        <input type="file" id="compiler-file-1" accept=".raaz" class="opt-select" style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff; padding: 4px 8px; width: 100%;">
+                    </div>
+                    <div class="input-group full-width" style="grid-column: span 2;">
+                        <label>File 2 (Part 2 / Days 11-20):</label>
+                        <input type="file" id="compiler-file-2" accept=".raaz" class="opt-select" style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff; padding: 4px 8px; width: 100%;">
+                    </div>
+                    <div class="input-group full-width" style="grid-column: span 2;">
+                        <label>File 3 (Part 3 / Days 21-30 - Optional):</label>
+                        <input type="file" id="compiler-file-3" accept=".raaz" class="opt-select" style="background-color: #16161e; border: 1px solid var(--ui-border); color: #fff; padding: 4px 8px; width: 100%;">
+                    </div>
+                    
+                    <hr style="grid-column: span 2; border: 0; border-top: 1px solid var(--ui-border); width: 100%; margin: 10px 0;">
+                    
+                    <div class="input-group full-width" style="grid-column: span 2;">
+                        <label for="compiled-title">New Magazine Title (मुख्य नाम):</label>
+                        <input type="text" id="compiled-title" value="सम्यक्" style="width: 100%;">
+                    </div>
+                    <div class="input-group full-width" style="grid-column: span 2;">
+                        <label for="compiled-tagline">New Tagline (टैगलाइन):</label>
+                        <input type="text" id="compiled-tagline" value="कोचिंग नहीं क्रांति" style="width: 100%;">
+                    </div>
+                    <div class="input-group full-width" style="grid-column: span 2;">
+                        <label for="compiled-subtitle">New Subtitle / Date (उपशीर्षक / तिथि):</label>
+                        <input type="text" id="compiled-subtitle" value="राजस्थान समसामयिकी : मई 2026 - संपूर्ण मासिक" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancel-compiler-btn" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="compile-confirm-btn" class="btn btn-primary" disabled>Compile & Merge</button>
+            </div>
+        </div>
+    </div>
+    <!-- Shortcuts & Formatting Help Modal -->
+    <div id="help-modal" class="modal-overlay">
+        <div class="modal-content" style="width: 580px; max-width: 95%;">
+            <div class="modal-header">
+                <h3>Formatting & Shortcuts Guide (फॉर्मेटिंग निर्देश)</h3>
+                <button id="close-help-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 450px; overflow-y: auto; font-family: var(--font-ui); font-size: 13px; gap: 16px; line-height: 1.5; color: #fff;">
+                <div style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--ui-border); padding: 12px; border-radius: 6px;">
+                    <h4 style="margin: 0 0 8px 0; color: var(--ui-accent); display: flex; align-items: center; gap: 6px; font-size: 14px;">
+                        <span>✍️</span> Markdown Basics (बुनियादी फॉर्मेटिंग)
+                    </h4>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; width: 40%; font-family: monospace;"># Section Name</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Main Heading Bar (मुख्य हेडिंग)</td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">## Topic Name</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Topic Title with underline (विषय हेडिंग)</td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">🔶, 🔷, 🔸, 🔹, ♦️, 💎</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Prefix for auto topic styling (बिना ## के)</td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">•, -, *, (1), 1.</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Bullet list items (बुलेट बिंदु)</td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">&gt; Highlight text</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Box Highlight / Note (💡 हाइलाइट बॉक्स)</td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">==green|text==</td><td style="padding: 6px 0; color: var(--ui-text-muted);"><span style="background-color: rgba(74, 222, 128, 0.35); border: 1px solid rgba(74, 222, 128, 0.5); padding: 1px 4px; border-radius: 3px; color: #4ade80;">Green Highlight</span></td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">==pink|text==</td><td style="padding: 6px 0; color: var(--ui-text-muted);"><span style="background-color: rgba(244, 114, 182, 0.35); border: 1px solid rgba(244, 114, 182, 0.5); padding: 1px 4px; border-radius: 3px; color: #f472b6;">Pink Highlight</span></td></tr>
+                    </table>
+                </div>
+
+                <div style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--ui-border); padding: 12px; border-radius: 6px;">
+                    <h4 style="margin: 0 0 8px 0; color: var(--ui-accent); display: flex; align-items: center; gap: 6px; font-size: 14px;">
+                        <span>📄</span> Layout & Structure (पेज लेआउट और गैप)
+                    </h4>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; width: 40%; font-family: monospace;">[pagebreak] या ---</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Force break to a new page (नया पेज ब्रेक)</td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">[space N] या space N</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Insert blank lines (e.g. <code>[space 3]</code>)</td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">***, * * *, [thankyou]</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Premium magazine end star divider (विभाजक)</td></tr>
+                    </table>
+                </div>
+
+                <div style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--ui-border); padding: 12px; border-radius: 6px;">
+                    <h4 style="margin: 0 0 8px 0; color: var(--ui-accent); display: flex; align-items: center; gap: 6px; font-size: 14px;">
+                        <span>🧩</span> Advanced Templates (विशेष कार्ड्स)
+                    </h4>
+                    <p style="margin: 0 0 8px 0; color: var(--ui-text-muted); font-size: 12px;">इन फॉर्मेट्स को एडिटर के <strong>Template dropdown</strong> से आसानी से लोड कर सकते हैं:</p>
+                    <ul style="margin: 0; padding-left: 18px; color: var(--ui-text-muted); line-height: 1.6;">
+                        <li style="margin-bottom: 6px;"><strong style="color: #fff;">Personality Card:</strong><br><code style="font-size: 11px; background-color: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 3px;">&lt;!-- personality|name=नाम|designation=पद|achievement=विवरण|image=इमेज ID --&gt;</code></li>
+                        <li style="margin-bottom: 6px;"><strong style="color: #fff;">Stats Card:</strong><br><code style="font-size: 11px; background-color: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 3px;">&lt;!-- stats|title=शीर्षक|value=आँकड़े|sub=विवरण --&gt;</code></li>
+                        <li style="margin-bottom: 6px;"><strong style="color: #fff;">Facts Grid:</strong><br><code style="font-size: 11px; background-color: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 3px;">&lt;!-- facts-grid|item1=तथ्य 1|item2=तथ्य 2|item3=तथ्य 3|item4=तथ्य 4 --&gt;</code></li>
+                        <li style="margin-bottom: 6px;"><strong style="color: #fff;">Announcement:</strong><br><code style="font-size: 11px; background-color: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 3px;">&lt;!-- announcement|title=शीर्षक|desc=विवरण --&gt;</code></li>
+                    </ul>
+                </div>
+
+                <div style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--ui-border); padding: 12px; border-radius: 6px;">
+                    <h4 style="margin: 0 0 8px 0; color: var(--ui-accent); display: flex; align-items: center; gap: 6px; font-size: 14px;">
+                        <span>⌨️</span> Keyboard Shortcuts (कीबोर्ड शॉर्टकट)
+                    </h4>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; width: 40%; font-family: monospace;">Ctrl + P</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Save Document as PDF (पीडीएफ सेव करें)</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="close-help-btn" class="btn btn-secondary">Close (बंद करें)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script loading -->
+    <script src="app.js"></script>
+</body>
+</html>
