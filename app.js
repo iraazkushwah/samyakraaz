@@ -276,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. WORKSPACE STATE
     let pagesData = [];      // Array of page objects: [ {type: 'cover', title: '...'}, {type: 'content', text: '...'} ]
+    let currentRenderedBlocks = []; // Array of currently rendered content blocks for scroll sync
     let activePageIndex = 0; // Current active page index
     let zoomLevel = window.innerWidth <= 1024 ? 60 : 100;      // Default scale is 60% on mobile, 100% on desktop
     let contentFontSize = 13.5; // Default body text font size is 13.5px
@@ -308,8 +309,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Premium Custom Design State (4th Control Section)
     let customDesignSettings = {
         // Headings spacing & alignment
-        topicMarginTop: '6px',
-        topicMarginBottom: '3px',
+        topicMarginTop: '12px',
+        topicMarginBottom: '4px',
         topicAlignment: 'flex-start',
         sectionAlignment: 'left',
         
@@ -410,9 +411,44 @@ document.addEventListener('DOMContentLoaded', () => {
     function debouncedRenderAndSaveTyping() {
         clearTimeout(typingTimeout);
         typingTimeout = setTimeout(() => {
-            renderPreview();
             saveWorkspaceToLocalStorage();
-        }, 800); // 800ms debounce specifically for typing to ensure fluid, zero-lag input experience
+        }, 800); // 800ms debounce specifically for typing to save work without interrupting active editing
+    }
+
+    // Scroll preview to match the current line in the editor
+    function syncPreviewScroll() {
+        if (activePageIndex <= 0 || activePageIndex >= pagesData.length || !currentRenderedBlocks || !currentRenderedBlocks.length) return;
+
+        // Get active cursor line
+        const textUpToCursor = pageContentInput.value.substring(0, pageContentInput.selectionStart);
+        const cursorLine = textUpToCursor.split('\n').length - 1;
+
+        // Calculate global line offset for the active page
+        let globalLineOffset = 0;
+        for (let idx = 1; idx < activePageIndex; idx++) {
+            globalLineOffset += pagesData[idx].text.split('\n').length;
+        }
+        const globalLine = globalLineOffset + cursorLine;
+
+        // Find the block corresponding to this global line
+        const matchedBlock = currentRenderedBlocks.find(block => {
+            return (typeof block.startLine !== 'undefined' && globalLine >= block.startLine && globalLine <= block.endLine);
+        });
+
+        if (matchedBlock) {
+            // Find the preview element
+            const previewElement = pagesContainer.querySelector(`[data-block-id="${matchedBlock.id}"]`);
+            if (previewElement) {
+                // Scroll the block into the center of the preview viewport
+                previewElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Highlight active block visually in preview
+                document.querySelectorAll('.active-block-highlight').forEach(el => {
+                    el.classList.remove('active-block-highlight');
+                });
+                previewElement.classList.add('active-block-highlight');
+            }
+        }
     }
 
     // Live update when writing on content pages
@@ -421,7 +457,15 @@ document.addEventListener('DOMContentLoaded', () => {
             pagesData[activePageIndex].text = pageContentInput.value;
             updateStats();
             debouncedRenderAndSaveTyping();
+            
+            // Sync scroll on input with a slight timeout to wait for DOM parsing
+            setTimeout(syncPreviewScroll, 50);
         }
+    });
+
+    // Also sync scroll when cursor selection/click changes
+    ['keyup', 'click', 'focus'].forEach(evtType => {
+        pageContentInput.addEventListener(evtType, syncPreviewScroll);
     });
 
     // Live update when editing cover metadata
@@ -1028,6 +1072,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Sync Preview manual button click listener
+    const syncPreviewBtn = document.getElementById('sync-preview-btn');
+    if (syncPreviewBtn) {
+        syncPreviewBtn.addEventListener('click', () => {
+            // Flash button visually to indicate refresh action
+            syncPreviewBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => { syncPreviewBtn.style.transform = 'none'; }, 100);
+            
+            // Set flag to force refocusing the editor textarea and capturing the cursor position
+            window.forceFocusEditor = true;
+            
+            // Force save current inputs
+            saveCurrentInputState();
+            
+            // Render the preview
+            renderPreview();
+            saveWorkspaceToLocalStorage();
+            
+            window.forceFocusEditor = false;
+        });
+    }
+
     // Floating Action Button (FAB) Menu logic
     const editorFabContainer = document.getElementById('editor-fab-container');
     const editorFabTrigger = document.getElementById('editor-fab-trigger');
@@ -1202,6 +1268,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         uploadedImages = state.uploadedImages || {};
                         imageCounter = state.imageCounter || 1;
 
+                        // Sync all UI inputs with the loaded data to prevent old UI values from corrupting new data
+                        if (pagesData[0]) {
+                            docTitleInput.value = pagesData[0].title || '';
+                            docTaglineInput.value = pagesData[0].tagline || '';
+                            docSubtitleInput.value = pagesData[0].subtitle || '';
+                            docThemeInput.value = pagesData[0].theme || 'maroon-gold';
+                        }
+                        if (lastPageData) {
+                            lastTitleInput.value = lastPageData.title || 'THANK YOU';
+                            lastSubtitleInput.value = lastPageData.subtitle || 'सम्यक्';
+                            lastTaglineInput.value = lastPageData.tagline || 'कोचिंग नहीं क्रांति';
+                        }
+
                         // Sync footer social inputs
                         if (footerTelegramInput) footerTelegramInput.value = socialSettings.telegramText || '';
                         if (footerYoutubeInput) footerYoutubeInput.value = socialSettings.youtubeText || '';
@@ -1251,10 +1330,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Apply customDesignSettings to DOM and UI inputs
                         applyCustomDesignSettingsToDOM();
 
-                        // Save, Render, Switch view
+                        // Sync UI inputs first without saving state to prevent overwriting new data with old UI values
+                        switchActivePage(activePageIndex, false);
                         saveWorkspaceToLocalStorage();
                         renderPreview();
-                        switchActivePage(activePageIndex);
                         
                         alert("Project successfully loaded! (फ़ाइल सफलतापूर्वक लोड हो गई है!)");
                     } catch (err) {
@@ -1645,7 +1724,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 insertWrappedAtCursor(pageContentInput, prefix, suffix);
                 pagesData[activePageIndex].text = pageContentInput.value;
-                renderPreview();
                 updateStats();
                 saveWorkspaceToLocalStorage();
             }
@@ -2134,9 +2212,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Switch active page editor view
-    function switchActivePage(index) {
-        // 1. Save current active page state
-        saveCurrentInputState();
+    function switchActivePage(index, saveState = true) {
+        // 1. Save current active page state if requested
+        if (saveState) {
+            saveCurrentInputState();
+        }
 
         // 2. Shift active index
         activePageIndex = index;
@@ -2153,6 +2233,19 @@ document.addEventListener('DOMContentLoaded', () => {
         switchSidebarTab('panel-editor');
 
         const lastTabIdx = pagesData.length;
+        const totalPages = pagesData.length + 1;
+        
+        // Dynamically show the current page inside the tab button itself
+        const tabEditorBtn = document.getElementById('tab-editor-btn');
+        if (tabEditorBtn) {
+            if (index === 0) {
+                tabEditorBtn.innerHTML = '<span class="tab-icon">✍️</span> Ed. (Cover)';
+            } else if (index === lastTabIdx) {
+                tabEditorBtn.innerHTML = '<span class="tab-icon">✍️</span> Ed. (End)';
+            } else {
+                tabEditorBtn.innerHTML = `<span class="tab-icon">✍️</span> Ed. (P. ${index + 1})`;
+            }
+        }
 
         if (index === 0) {
             // Display Cover controls
@@ -2215,8 +2308,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             // Add active highlight
             targetPageElement.classList.add('active-page-spotlight');
-            // Scroll to element center
-            targetPageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Scroll to element center or block center
+            if (index === 0 || index === lastTabIdx) {
+                targetPageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                // Let syncPreviewScroll align smoothly to the active editing block
+                setTimeout(syncPreviewScroll, 80);
+            }
         }
 
         updateStats();
@@ -2359,12 +2458,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
 
         for (let i = 0; i < lines.length; i++) {
+            const start = i;
             const line = lines[i];
             const trimmed = line.trim();
             if (!trimmed) {
                 blocks.push({
                     type: 'empty',
-                    markdown: ''
+                    markdown: '',
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
@@ -2390,7 +2492,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 blocks.push({
                     type: 'box-container',
                     boxType: boxType,
-                    markdown: boxLines.join('\n')
+                    markdown: boxLines.join('\n'),
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
@@ -2402,7 +2506,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 blocks.push({
                     type: 'spacer',
                     count: count,
-                    markdown: trimmed
+                    markdown: trimmed,
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
@@ -2411,28 +2517,36 @@ document.addEventListener('DOMContentLoaded', () => {
             if (trimmed.startsWith('<!-- personality|') && trimmed.endsWith('-->')) {
                 blocks.push({
                     type: 'personality',
-                    markdown: trimmed
+                    markdown: trimmed,
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
             if (trimmed.startsWith('<!-- stats|') && trimmed.endsWith('-->')) {
                 blocks.push({
                     type: 'stats',
-                    markdown: trimmed
+                    markdown: trimmed,
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
             if (trimmed.startsWith('<!-- facts-grid|') && trimmed.endsWith('-->')) {
                 blocks.push({
                     type: 'facts-grid',
-                    markdown: trimmed
+                    markdown: trimmed,
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
             if (trimmed.startsWith('<!-- announcement|') && trimmed.endsWith('-->')) {
                 blocks.push({
                     type: 'announcement',
-                    markdown: trimmed
+                    markdown: trimmed,
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
@@ -2451,7 +2565,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     blocks.push({
                         type: 'table',
                         config: tableConfig,
-                        markdown: tableLines.join('\n')
+                        markdown: tableLines.join('\n'),
+                        startLine: start,
+                        endLine: i
                     });
                     continue;
                 }
@@ -2464,7 +2580,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 blocks.push({
                     type: 'table',
                     config: null,
-                    markdown: tableLines.join('\n')
+                    markdown: tableLines.join('\n'),
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
@@ -2473,7 +2591,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (trimmed === '[pagebreak]' || trimmed === '---') {
                 blocks.push({
                     type: 'pagebreak',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
@@ -2482,7 +2602,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (trimmed === '[columnbreak]' || trimmed === '[colbreak]') {
                 blocks.push({
                     type: 'columnbreak',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
@@ -2491,7 +2613,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (trimmed === '[thankyou]' || trimmed === '***' || trimmed === '* * *' || trimmed === '✦ ✦ ✦') {
                 blocks.push({
                     type: 'thankyou',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
                 continue;
             }
@@ -2502,7 +2626,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (trimmed.startsWith('# ') || (trimmed.startsWith('#') && !trimmed.startsWith('##'))) {
                 blocks.push({
                     type: 'section',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
             } else if (
                 !trimmed.startsWith('##') &&
@@ -2514,7 +2640,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ) {
                 blocks.push({
                     type: 'section',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
             } 
             
@@ -2527,7 +2655,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ) {
                 blocks.push({
                     type: 'topic',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
             } 
             
@@ -2541,7 +2671,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ) {
                 blocks.push({
                     type: 'bullet',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
             } 
             
@@ -2549,7 +2681,9 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (trimmed.startsWith('> ')) {
                 blocks.push({
                     type: 'box',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
             } 
 
@@ -2557,7 +2691,9 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (trimmed.startsWith('![') && trimmed.endsWith(')')) {
                 blocks.push({
                     type: 'image',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
             }
             
@@ -2565,7 +2701,9 @@ document.addEventListener('DOMContentLoaded', () => {
             else {
                 blocks.push({
                     type: 'paragraph',
-                    markdown: line
+                    markdown: line,
+                    startLine: start,
+                    endLine: i
                 });
             }
         }
@@ -3202,7 +3340,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pagesContainer.appendChild(coverPageElement);
 
         // 1.5 Track cursor position in content pages
-        const isEditorActive = (document.activeElement === pageContentInput && activePageIndex > 0 && activePageIndex < pagesData.length);
+        const isEditorActive = (activePageIndex > 0 && activePageIndex < pagesData.length) && 
+                               (document.activeElement === pageContentInput || window.forceFocusEditor);
         let cursorStart = 0;
         let cursorEnd = 0;
         let globalCursorPos = 0;
@@ -3226,6 +3365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Distribute blocks across Content Pages dynamically
         const fullContentMarkdown = pagesData.slice(1).map(p => p.text).join('\n');
         const blocks = parseTextToBlocks(fullContentMarkdown);
+        currentRenderedBlocks = blocks; // Save globally for scroll sync
         
         // Append special star divider block at the end if not already present in markdown text
         const hasThankYou = blocks.some(b => b.type === 'thankyou');
@@ -3574,6 +3714,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isEditorActive) {
                 pageContentInput.focus();
                 pageContentInput.setSelectionRange(cursorStart, cursorEnd);
+                // Force trigger scroll sync immediately to highlight the active block in the preview panel
+                syncPreviewScroll();
             }
             activePageLabel.textContent = `Editing: Page ${activePageIndex}`;
         }
@@ -4242,8 +4384,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     socialSettings = state.socialSettings || { telegramText: '@samyak', youtubeText: 'Samyak Coaching' };
                     if (socialSettings.fontSize === undefined) socialSettings.fontSize = 11;
                     if (socialSettings.placement === undefined) socialSettings.placement = 'split';
-                    uploadedImages = state.uploadedImages || {};
+                    uploadedImages = state.slateImages || state.uploadedImages || {};
                     imageCounter = state.imageCounter || 1;
+
+                    // Sync all UI inputs with the loaded data to prevent old UI values from corrupting new data
+                    if (pagesData[0]) {
+                        docTitleInput.value = pagesData[0].title || '';
+                        docTaglineInput.value = pagesData[0].tagline || '';
+                        docSubtitleInput.value = pagesData[0].subtitle || '';
+                        docThemeInput.value = pagesData[0].theme || 'maroon-gold';
+                    }
+                    if (lastPageData) {
+                        lastTitleInput.value = lastPageData.title || 'THANK YOU';
+                        lastSubtitleInput.value = lastPageData.subtitle || 'सम्यक्';
+                        lastTaglineInput.value = lastPageData.tagline || 'कोचिंग नहीं क्रांति';
+                    }
 
                     if (footerTelegramInput) footerTelegramInput.value = socialSettings.telegramText || '';
                     if (footerYoutubeInput) footerYoutubeInput.value = socialSettings.youtubeText || '';
@@ -4298,9 +4453,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('samyak-global-theme', restoredTheme);
                     applyTheme(restoredTheme);
 
-                    // Re-render Preview & Set active page editor
+                    // Sync UI inputs first without saving state to prevent overwriting new data with old UI values
+                    switchActivePage(activePageIndex, false);
                     renderPreview();
-                    switchActivePage(activePageIndex);
                     
                     return true;
                 } catch (e) {
@@ -4890,8 +5045,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.addEventListener('mousemove', (e) => {
             if (!isResizing) return;
-            // Bound the panel resizing width (min 380px, max 800px)
-            const newWidth = Math.max(380, Math.min(800, e.clientX));
+            // Bound the panel resizing width to maximize editor space without showing horizontal scrollbar in A4 preview
+            const maxAllowedWidth = Math.max(380, window.innerWidth - 860);
+            const newWidth = Math.max(380, Math.min(maxAllowedWidth, e.clientX));
             editorPanel.style.width = `${newWidth}px`;
         });
 
@@ -5375,4 +5531,190 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize render
         renderDropdownList();
     })();
+
+    // ==========================================================================
+    // RAAZ PROFILE MODAL CONTROLLER & FIREWORKS
+    // ==========================================================================
+    const raazModal = document.getElementById('raaz-profile-modal');
+    const authorNameBtn = document.getElementById('author-name-btn');
+    const closeRaazModalBtn = document.getElementById('close-raaz-modal-btn');
+    const closeRaazBtn = document.getElementById('close-raaz-btn');
+    const fireworksCanvas = document.getElementById('raaz-fireworks-canvas');
+
+    let isFireworksActive = false;
+    let fireworksAnimationFrameId = null;
+
+    function runFireworksSimulation() {
+        if (!fireworksCanvas) return;
+        const ctx = fireworksCanvas.getContext('2d');
+        isFireworksActive = true;
+
+        const resizeCanvas = () => {
+            fireworksCanvas.width = fireworksCanvas.parentElement.clientWidth;
+            fireworksCanvas.height = fireworksCanvas.parentElement.clientHeight;
+        };
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let particles = [];
+        let rockets = [];
+
+        class Rocket {
+            constructor() {
+                // Shoot from sides of the screen to keep center (profile card) clear
+                this.fromLeft = Math.random() < 0.5;
+                this.x = this.fromLeft ? Math.random() * (fireworksCanvas.width * 0.2) : fireworksCanvas.width - Math.random() * (fireworksCanvas.width * 0.2);
+                this.y = fireworksCanvas.height;
+                
+                this.targetY = fireworksCanvas.height * 0.15 + Math.random() * (fireworksCanvas.height * 0.4);
+                this.targetX = this.fromLeft 
+                    ? fireworksCanvas.width * 0.12 + Math.random() * (fireworksCanvas.width * 0.18) 
+                    : fireworksCanvas.width * 0.7 + Math.random() * (fireworksCanvas.width * 0.18);
+                
+                const angle = Math.atan2(this.targetY - this.y, this.targetX - this.x);
+                const speed = 11 + Math.random() * 6;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                
+                // Cyan/blue lightning theme colors
+                this.color = Math.random() < 0.6 ? '#00f0ff' : (Math.random() < 0.5 ? '#38bdf8' : '#8b5cf6');
+                this.trail = [];
+            }
+
+            update() {
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > 6) this.trail.shift();
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.beginPath();
+                this.trail.forEach(pt => ctx.lineTo(pt.x, pt.y));
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            shouldExplode() {
+                return this.vy >= 0 || this.y <= this.targetY || (this.fromLeft ? this.x >= this.targetX : this.x <= this.targetX);
+            }
+
+            explode() {
+                const count = 35 + Math.floor(Math.random() * 25);
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle(this.x, this.y, this.color));
+                }
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 1.5;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.008;
+                this.gravity = 0.06;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.vy += this.gravity;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 1.5 + Math.random() * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function animationLoop() {
+            if (!isFireworksActive) return;
+            
+            // clear rect with slight transparency for trail effect
+            ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+            if (Math.random() < 0.045 && rockets.length < 5) {
+                rockets.push(new Rocket());
+            }
+
+            rockets.forEach((rocket, idx) => {
+                rocket.update();
+                rocket.draw();
+                if (rocket.shouldExplode()) {
+                    rocket.explode();
+                    rockets.splice(idx, 1);
+                }
+            });
+
+            particles.forEach((p, idx) => {
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) {
+                    particles.splice(idx, 1);
+                }
+            });
+
+            fireworksAnimationFrameId = requestAnimationFrame(animationLoop);
+        }
+
+        animationLoop();
+
+        return () => {
+            isFireworksActive = false;
+            cancelAnimationFrame(fireworksAnimationFrameId);
+            window.removeEventListener('resize', resizeCanvas);
+            ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+        };
+    }
+
+    let stopFireworksSimulation = null;
+
+    if (authorNameBtn && raazModal) {
+        authorNameBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            raazModal.classList.add('active');
+            // Trigger fireworks on all devices
+            if (stopFireworksSimulation) stopFireworksSimulation();
+            stopFireworksSimulation = runFireworksSimulation();
+        });
+
+        const hideRaazModal = () => {
+            raazModal.classList.remove('active');
+            if (stopFireworksSimulation) {
+                stopFireworksSimulation();
+                stopFireworksSimulation = null;
+            }
+        };
+
+        if (closeRaazModalBtn) closeRaazModalBtn.addEventListener('click', hideRaazModal);
+        if (closeRaazBtn) closeRaazBtn.addEventListener('click', hideRaazModal);
+
+        raazModal.addEventListener('click', (e) => {
+            if (e.target === raazModal) {
+                hideRaazModal();
+            }
+        });
+    }
 });

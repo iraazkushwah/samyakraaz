@@ -7,7 +7,7 @@
     <!-- Google Fonts: Poppins (modern UI), Noto Sans Devanagari (Hindi Body), Rozha One (Calligraphy/Display Serif), Martel (Traditional serif) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Martel:wght@400;700;900&family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Serif+Devanagari:wght@400;600;700;900&family=Poppins:wght@300;400;500;600;700&family=Rozha+One&family=Yatra+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Martel:wght@400;700;900&family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Serif+Devanagari:wght@400;600;700;900&family=Poppins:wght@300;400;500;600;700&family=Rozha+One&family=Yatra+One&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -21,10 +21,10 @@
                     <span class="logo-icon">📚</span>
                     <div class="logo-text">
                         <h1>सम्यक्</h1>
-                        <p>by Raaz Kushwah</p>
                     </div>
                 </div>
                 <div class="header-global-actions">
+                    <button id="sync-preview-btn" class="header-action-btn" title="Sync/Refresh Preview (🔄)" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border-color: rgba(99, 102, 241, 0.25);">🔄</button>
                     <div class="header-theme-container" title="Visual Theme">
                         <button id="theme-menu-trigger" class="header-action-btn" type="button" tabindex="-1">🎨</button>
                         <select id="doc-theme" class="header-theme-select" style="display: none;">
@@ -115,7 +115,11 @@
                     <button id="compile-magazines-btn" class="header-action-btn" title="Compile Monthly Magazine">🛠️</button>
                     <input type="file" id="import-project-file" accept=".raaz" style="display: none;">
                 </div>
-                <div class="badge-status">Workspace Active</div>
+                <div class="author-credit" id="author-name-btn" title="View Raaz's Profile">
+                    <span class="author-by">by</span>
+                    <img src="raaz_profile.png" alt="Raaz Kushwah" class="author-avatar-mini">
+                    <span class="author-name">Raaz</span>
+                </div>
                 
                 <!-- Custom Pinnable Searchable Dropdown Panel -->
                 <div id="custom-theme-dropdown" class="custom-theme-dropdown-panel" style="display: none;">
@@ -475,6 +479,10 @@
                                         <option value="pill">Pill / Stadium</option>
                                         <option value="left-stripe">Left Accent Stripe</option>
                                         <option value="underline">Elegant Underline</option>
+                                        <option value="ribbon-banner">Ribbon Banner 🎗️</option>
+                                        <option value="editorial-double">Editorial Double Line 📰</option>
+                                        <option value="bracket-frame">Bracket Frame ［ ］</option>
+                                        <option value="diagonal-cut">Skewed Diagonal Cut ╱</option>
                                     </select>
                                 </div>
                             </div>
@@ -504,10 +512,10 @@
                                 <div class="option-item">
                                     <label><span class="opt-icon">↕️</span> Spacing (margin):</label>
                                     <select id="design-topic-margin" class="opt-select">
-                                        <option value="4px 2px" selected>Normal</option>
-                                        <option value="8px 4px">Wide</option>
-                                        <option value="12px 6px">Relaxed</option>
-                                        <option value="2px 1px">Compact</option>
+                                        <option value="12px 4px" selected>Normal</option>
+                                        <option value="18px 6px">Wide</option>
+                                        <option value="24px 8px">Relaxed</option>
+                                        <option value="6px 2px">Compact</option>
                                     </select>
                                 </div>
                                 <div class="option-item">
@@ -976,6 +984,56 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="close-help-btn" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Raaz's Profile Modal -->
+    <div id="raaz-profile-modal" class="modal-overlay">
+        <canvas id="raaz-fireworks-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></canvas>
+        <div class="modal-content raaz-profile-card" style="z-index: 2; position: relative;">
+            <div class="modal-header">
+                <h3>👤 Developer Profile</h3>
+                <button id="close-raaz-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body raaz-profile-body">
+                <div class="raaz-profile-header">
+                     <div class="raaz-avatar-container">
+                         <img src="raaz_profile.png" alt="Raaz Kushwah" class="raaz-avatar">
+                         <div class="raaz-avatar-glow"></div>
+                     </div>
+                     <h2 class="raaz-name">Raaz Kushwah</h2>
+                     <p class="raaz-title">techy who hates tech</p>
+                </div>
+                <div class="raaz-info-grid">
+                     <div class="raaz-info-item">
+                         <span class="raaz-info-icon">🎂</span>
+                         <div class="raaz-info-content">
+                             <label>Date of Birth</label>
+                             <span>03 March 2002</span>
+                         </div>
+                     </div>
+                     <div class="raaz-info-item">
+                         <span class="raaz-info-icon">📍</span>
+                         <div class="raaz-info-content">
+                             <label>Address</label>
+                             <span>Dholpur, Rajasthan, India</span>
+                         </div>
+                     </div>
+                </div>
+                <div class="raaz-qualities-section">
+                     <h4>🌟 Key Qualities & Skills</h4>
+                     <div class="raaz-qualities-tags">
+                         <span class="raaz-tag">Creative Frontend Developer</span>
+                         <span class="raaz-tag">UI/UX Specialist</span>
+                         <span class="raaz-tag">Problem Solver</span>
+                         <span class="raaz-tag">Samyak Architect</span>
+                         <span class="raaz-tag">Tech Enthusiast</span>
+                     </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="close-raaz-btn" class="btn btn-secondary" style="width: 100%; justify-content: center;">Close Profile</button>
             </div>
         </div>
     </div>
