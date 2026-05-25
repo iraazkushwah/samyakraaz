@@ -246,6 +246,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Header Logo
         headerLogoSrc: '',
 
+        // Page Borders & Decor
+        borderThick: '0',
+        cornerSize: '10',
+        innerBorderColor: '#c5a353',
+        cornerColor: '#c5a353',
+
         // Two-column Divider
         dividerColor: '',
         dividerStyle: 'dashed',
@@ -366,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
     docThemeInput.addEventListener('change', () => {
         if (pagesData[0]) {
             pagesData[0].theme = docThemeInput.value;
+            localStorage.setItem('samyak-global-theme', docThemeInput.value);
             applyTheme(docThemeInput.value);
             renderPreview();
             saveWorkspaceToLocalStorage();
@@ -942,6 +949,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Floating Action Button (FAB) Menu logic
+    const editorFabContainer = document.getElementById('editor-fab-container');
+    const editorFabTrigger = document.getElementById('editor-fab-trigger');
+
+    if (editorFabTrigger && editorFabContainer) {
+        editorFabTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            editorFabContainer.classList.toggle('open');
+            const isOpen = editorFabContainer.classList.contains('open');
+            editorFabTrigger.textContent = isOpen ? '✕' : '⚡';
+            editorFabTrigger.setAttribute('title', isOpen ? 'Close Menu' : 'Quick Actions');
+        });
+        
+        // Auto-close menu on clicking elsewhere
+        document.addEventListener('click', () => {
+            if (editorFabContainer.classList.contains('open')) {
+                editorFabContainer.classList.remove('open');
+                editorFabTrigger.textContent = '⚡';
+                editorFabTrigger.setAttribute('title', 'Quick Actions');
+            }
+        });
+    }
     // Page Layout binding
     if (pageLayoutSelect) {
         pageLayoutSelect.addEventListener('change', () => {
@@ -1283,7 +1312,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     // Smart Shrink (Overflow Fixer) Click Listener
     if (smartShrinkBtn) {
         smartShrinkBtn.addEventListener('click', () => {
@@ -1395,16 +1424,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Highly robust PDF print button action
-    printPdfBtn.addEventListener('click', () => {
-        // 1. Save current state of inputs
-        saveCurrentInputState();
-        // 2. Re-render standard layouts to ensure perfect content alignment
-        renderPreview();
-        // 3. Set a small timeout to allow browser layout engines to paint the DOM completely
-        setTimeout(() => {
-            window.print();
-        }, 150);
-    });
+    if (printPdfBtn) {
+        printPdfBtn.addEventListener('click', () => {
+            // 1. Save current state of inputs
+            saveCurrentInputState();
+            // 2. Re-render standard layouts to ensure perfect content alignment
+            renderPreview();
+            // 3. Set a small timeout to allow browser layout engines to paint the DOM completely
+            setTimeout(() => {
+                window.print();
+            }, 150);
+        });
+    }
+
 
     // Intercept default Ctrl+P globally to ensure our dynamic paginated preview is saved/rendered first
     window.addEventListener('keydown', (e) => {
@@ -1462,6 +1494,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Line spacing dynamic binding
+    // Line spacing dynamic binding
     globalLineSpacingSelect.addEventListener('change', () => {
         cachedMaxContentHeight = null; // Clear height cache
         document.documentElement.style.setProperty('--content-line-height', globalLineSpacingSelect.value);
@@ -1506,6 +1539,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Box style select dropdown handler
+    const boxStyleSelect = document.getElementById('box-style-select');
+    if (boxStyleSelect) {
+        boxStyleSelect.addEventListener('change', () => {
+            const selectedStyle = boxStyleSelect.value;
+            if (selectedStyle && activePageIndex > 0) {
+                const prefix = `[${selectedStyle}]\n`;
+                const suffix = '\n[/box]';
+                
+                insertWrappedAtCursor(pageContentInput, prefix, suffix);
+                pagesData[activePageIndex].text = pageContentInput.value;
+                renderPreview();
+                updateStats();
+                saveWorkspaceToLocalStorage();
+            }
+            // Reset to show default "Box" placeholder option
+            boxStyleSelect.value = "";
+        });
+    }
 
 
 
@@ -1854,15 +1907,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const lastTabIdx = pagesData.length;
 
-        const pageLayoutBar = document.querySelector('.page-layout-bar');
-
         if (index === 0) {
             // Display Cover controls
             coverEditorZone.classList.add('active');
             contentEditorZone.classList.remove('active');
             lastEditorZone.classList.remove('active');
             activePageLabel.textContent = "Editing: Cover Page";
-            if (pageLayoutBar) pageLayoutBar.style.display = 'none';
+            
+            if (pageTemplateSelect) pageTemplateSelect.disabled = true;
+            if (pageLayoutSelect) pageLayoutSelect.disabled = true;
+            if (applyLayoutAllBtn) applyLayoutAllBtn.disabled = true;
             
             // Sync values to cover fields
             docTitleInput.value = pagesData[0].title;
@@ -1875,7 +1929,10 @@ document.addEventListener('DOMContentLoaded', () => {
             contentEditorZone.classList.remove('active');
             lastEditorZone.classList.add('active');
             activePageLabel.textContent = "Editing: End Page";
-            if (pageLayoutBar) pageLayoutBar.style.display = 'none';
+
+            if (pageTemplateSelect) pageTemplateSelect.disabled = true;
+            if (pageLayoutSelect) pageLayoutSelect.disabled = true;
+            if (applyLayoutAllBtn) applyLayoutAllBtn.disabled = true;
 
             // Sync values to last page fields
             lastTitleInput.value = lastPageData.title;
@@ -1887,7 +1944,10 @@ document.addEventListener('DOMContentLoaded', () => {
             contentEditorZone.classList.add('active');
             lastEditorZone.classList.remove('active');
             activePageLabel.textContent = `Editing: Page ${index}`;
-            if (pageLayoutBar) pageLayoutBar.style.display = 'flex';
+            
+            if (pageTemplateSelect) pageTemplateSelect.disabled = false;
+            if (pageLayoutSelect) pageLayoutSelect.disabled = false;
+            if (applyLayoutAllBtn) applyLayoutAllBtn.disabled = false;
             
             // Sync page layout selector
             if (pageLayoutSelect && pagesData[index]) {
@@ -2058,6 +2118,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 blocks.push({
                     type: 'empty',
                     markdown: ''
+                });
+                continue;
+            }
+
+            // 0.2 BOX CONTAINER BLOCK DETECTOR
+            const bulletRegex = /^\s*(?:[•\-\*\u2022\u25CF]|\(\d+\)|\d+\.)\s*/;
+            const cleanBoxLine = trimmed.replace(bulletRegex, '').trim();
+
+            if (cleanBoxLine.startsWith('[box') && cleanBoxLine.endsWith(']')) {
+                const boxType = cleanBoxLine.substring(1, cleanBoxLine.length - 1); // e.g. "box", "box-double", "box-dashed", "box-bg", "box-royal"
+                let boxLines = [];
+                i++; // consume opening tag line
+                while (i < lines.length) {
+                    const nextLine = lines[i];
+                    const nextTrimmed = nextLine.trim();
+                    const nextCleanBoxLine = nextTrimmed.replace(bulletRegex, '').trim();
+                    if (nextCleanBoxLine === '[/box]') {
+                        break;
+                    }
+                    boxLines.push(nextLine);
+                    i++;
+                }
+                blocks.push({
+                    type: 'box-container',
+                    boxType: boxType,
+                    markdown: boxLines.join('\n')
                 });
                 continue;
             }
@@ -2278,6 +2364,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderBlockToNode(block) {
         const line = block.markdown.trim();
+        
+        if (block.type === 'box-container') {
+            const containerEl = document.createElement('div');
+            containerEl.className = `premium-box ${block.boxType || 'box'}`;
+            
+            // Parse the internal markdown into blocks recursively
+            const innerBlocks = parseTextToBlocks(block.markdown);
+            
+            // Render and append each block
+            innerBlocks.forEach(innerBlock => {
+                const node = renderBlockToNode(innerBlock);
+                if (node) {
+                    containerEl.appendChild(node);
+                }
+            });
+            
+            return containerEl;
+        }
         
         if (block.type === 'personality') {
             const attrs = parseCommentAttributes(line);
@@ -2728,6 +2832,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!trimmed) return lineHeight;
 
         switch (block.type) {
+            case 'box-container':
+                {
+                    const innerBlocks = parseTextToBlocks(block.markdown);
+                    let innerHeight = 0;
+                    innerBlocks.forEach(inner => {
+                        innerHeight += estimateBlockHeight(inner, fontSize, lineSpacing, isTwoCol);
+                    });
+                    return innerHeight + 24; // Inner blocks height + 24px box padding
+                }
             case 'section':
                 return 55; // 18px font size + padding/margin
             case 'topic':
@@ -3586,7 +3699,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. GENERAL UTILITIES
     function applyTheme(themeName) {
-        document.body.className = '';
+        // Remove existing theme classes to preserve other classes like font styles
+        const classesToRemove = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
+        classesToRemove.forEach(c => document.body.classList.remove(c));
+
         if (themeName !== 'maroon-gold') {
             document.body.classList.add(`theme-${themeName}`);
         }
@@ -3649,7 +3765,6 @@ document.addEventListener('DOMContentLoaded', () => {
             socialSettings,
             uploadedImages,
             imageCounter,
-            // also fonts & spacing settings
             spacingSettings: {
                 fontStyle: globalFontStyleSelect.value,
                 fontWeight: globalFontWeightSelect.value,
@@ -3699,8 +3814,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.documentElement.style.setProperty('--custom-inner-border-color', customDesignSettings.innerBorderColor || 'var(--secondary-color)');
         document.documentElement.style.setProperty('--custom-corner-color', customDesignSettings.cornerColor || 'var(--secondary-color)');
-        document.documentElement.style.setProperty('--custom-inner-border-thickness', `${customDesignSettings.borderThick || 1}px`);
-        document.documentElement.style.setProperty('--custom-corner-size', `${customDesignSettings.cornerSize || 22}px`);
+        document.documentElement.style.setProperty('--custom-inner-border-thickness', `${customDesignSettings.borderThick !== undefined ? customDesignSettings.borderThick : 0}px`);
+        document.documentElement.style.setProperty('--custom-corner-size', `${customDesignSettings.cornerSize !== undefined ? customDesignSettings.cornerSize : 10}px`);
 
         // Two-column divider variables update
         document.documentElement.style.setProperty('--custom-divider-color', customDesignSettings.dividerColor || 'var(--secondary-color)');
@@ -3743,10 +3858,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         designInnerBorder.value = customDesignSettings.innerBorderColor || '#c5a353';
         designCornerColor.value = customDesignSettings.cornerColor || '#c5a353';
-        designBorderThick.value = customDesignSettings.borderThick || '1';
-        designBorderThickVal.textContent = `${customDesignSettings.borderThick || 1}px`;
-        designCornerSize.value = customDesignSettings.cornerSize || '22';
-        designCornerSizeVal.textContent = `${customDesignSettings.cornerSize || 22}px`;
+        designBorderThick.value = customDesignSettings.borderThick !== undefined ? customDesignSettings.borderThick : '0';
+        designBorderThickVal.textContent = `${customDesignSettings.borderThick !== undefined ? customDesignSettings.borderThick : 0}px`;
+        designCornerSize.value = customDesignSettings.cornerSize !== undefined ? customDesignSettings.cornerSize : '10';
+        designCornerSizeVal.textContent = `${customDesignSettings.cornerSize !== undefined ? customDesignSettings.cornerSize : 10}px`;
 
         // Sync two-column divider UI inputs
         designDividerColor.value = customDesignSettings.dividerColor || '#c5a353';
@@ -3866,6 +3981,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Apply customDesignSettings to DOM and UI inputs
                     applyCustomDesignSettingsToDOM();
 
+                    // Apply saved visual theme
+                    const restoredTheme = (pagesData[0] && pagesData[0].theme) || 'maroon-gold';
+                    localStorage.setItem('samyak-global-theme', restoredTheme);
+                    applyTheme(restoredTheme);
+
                     // Re-render Preview & Set active page editor
                     renderPreview();
                     switchActivePage(activePageIndex);
@@ -3883,14 +4003,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function clearWorkspaceContent() {
-        // Keep the cover page metadata as is
+        // Capture currently selected active theme so it acts as a persistent global setting
+        const activeTheme = localStorage.getItem('samyak-global-theme') || docThemeInput.value || 'maroon-gold';
+
+        // Keep the cover page metadata as is, enforcing the active theme
         const currentCover = pagesData[0] || {
             type: 'cover',
             title: 'सम्यक्',
             tagline: 'कोचिंग नहीं क्रांति',
             subtitle: 'राजस्थान समसामयिकी',
-            theme: 'maroon-gold'
+            theme: activeTheme
         };
+        currentCover.theme = activeTheme;
 
         pagesData = [
             currentCover,
@@ -3909,18 +4033,16 @@ document.addEventListener('DOMContentLoaded', () => {
         docTitleInput.value = pagesData[0].title;
         docTaglineInput.value = pagesData[0].tagline;
         docSubtitleInput.value = pagesData[0].subtitle;
-        docThemeInput.value = pagesData[0].theme;
+        
+        // Keep user's active theme preserved and trigger change event to sync searchable custom select & save
+        docThemeInput.value = activeTheme;
+        docThemeInput.dispatchEvent(new Event('change'));
         
         // Clear uploaded images
         uploadedImages = {};
         imageCounter = 1;
         
-        // Re-apply Theme properties to ensure sync
-        applyTheme(pagesData[0].theme);
-        
-        // Save to LocalStorage, Re-render, Switch to Cover Tab
-        saveWorkspaceToLocalStorage();
-        renderPreview();
+        // Switch to Cover Tab
         switchActivePage(0);
         switchSidebarTab('panel-pages');
     }
@@ -4099,7 +4221,6 @@ document.addEventListener('DOMContentLoaded', () => {
         contentFontSize = 13.5;
         fontSizeValSpan.textContent = `13.5px`;
         document.documentElement.style.setProperty('--content-font-size', `13.5px`);
-        
         // Reset dynamic spacing options
         globalFontStyleSelect.value = 'modern-sans';
         globalFontWeightSelect.value = '700';
@@ -4168,12 +4289,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.setProperty('--custom-topic-alignment', 'flex-start');
         customDesignSettings.topicAlignment = 'flex-start';
 
-        designBorderThick.value = '1';
-        designBorderThickVal.textContent = '1px';
-        document.documentElement.style.setProperty('--custom-inner-border-thickness', '1px');
-        designCornerSize.value = '22';
-        designCornerSizeVal.textContent = '22px';
-        document.documentElement.style.setProperty('--custom-corner-size', '22px');
+        designBorderThick.value = '0';
+        designBorderThickVal.textContent = '0px';
+        document.documentElement.style.setProperty('--custom-inner-border-thickness', '0px');
+        designCornerSize.value = '10';
+        designCornerSizeVal.textContent = '10px';
+        document.documentElement.style.setProperty('--custom-corner-size', '10px');
 
         designPageNumPlace.value = 'bottom-center';
         customDesignSettings.pageNumPlacement = 'bottom-center';
@@ -4228,6 +4349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (footerSocialSizeVal) footerSocialSizeVal.textContent = '11px';
         if (footerSocialPlacementSelect) footerSocialPlacementSelect.value = 'split';
 
+        localStorage.setItem('samyak-global-theme', pagesData[0].theme);
         applyTheme(pagesData[0].theme); // Automatically syncs colors via syncDesignControlsWithTheme()
 
         renderPreview();
@@ -4641,4 +4763,233 @@ document.addEventListener('DOMContentLoaded', () => {
         clearWorkspaceContent();
         updateZoom();
     });
+
+    // ==========================================================================
+    // CUSTOM SEARCHABLE AND PINNABLE THEME DROPDOWN SYSTEM
+    // ==========================================================================
+    (() => {
+        const trigger = document.getElementById('theme-menu-trigger');
+        const dropdown = document.getElementById('custom-theme-dropdown');
+        const searchInput = document.getElementById('theme-search-input');
+        const listContainer = dropdown.querySelector('.theme-list-container');
+        const nativeSelect = document.getElementById('doc-theme');
+
+        // All defined themes with their respective preview colors (Primary, Secondary, Accent)
+        const themes = [
+            { value: 'maroon-gold', name: 'Samyak Maroon & Gold', category: 'classic', colors: ['#850f0f', '#c5a353', '#1d6ea5'] },
+            { value: 'maroon-compact', name: 'Samyak Maroon & Gold - Compact', category: 'classic', colors: ['#850f0f', '#c5a353', '#1d6ea5'] },
+            { value: 'royal-navy', name: 'Royal Navy & Gold', category: 'classic', colors: ['#0e2743', '#c49429', '#be2e2e'] },
+            { value: 'navy-compact', name: 'Royal Navy & Gold - Compact', category: 'classic', colors: ['#0e2743', '#c49429', '#be2e2e'] },
+            { value: 'emerald-cream', name: 'Emerald Forest & Cream', category: 'classic', colors: ['#083c2a', '#b77a20', '#2b6cb0'] },
+            { value: 'emerald-compact', name: 'Emerald Forest & Cream - Compact', category: 'classic', colors: ['#083c2a', '#b77a20', '#2b6cb0'] },
+            { value: 'midnight-gold', name: 'Midnight Slate & Gold', category: 'classic', colors: ['#151b26', '#c99324', '#2b8c8a'] },
+            { value: 'minimal-compact', name: 'Samyak Minimal & Compact', category: 'classic', colors: ['#1e293b', '#94a3b8', '#6366f1'] },
+            { value: 'sakura-plum', name: '🌸 Sakura Blossom & Plum', category: 'classic', colors: ['#5c1d3b', '#f472b6', '#be185d'] },
+            { value: 'sakura-compact', name: '🌸 Sakura Blossom & Plum - Compact', category: 'classic', colors: ['#5c1d3b', '#f472b6', '#be185d'] },
+            { value: 'nordic-rust', name: '🌲 Nordic Forest & Warm Rust', category: 'classic', colors: ['#064e3b', '#c2410c', '#b45309'] },
+            { value: 'nordic-compact', name: '🌲 Nordic Forest & Rust - Compact', category: 'classic', colors: ['#064e3b', '#c2410c', '#b45309'] },
+            { value: 'cyber-teal', name: '⚡ Cyber Midnight & Glowing Cyan', category: 'classic', colors: ['#0f172a', '#06b6d4', '#3b82f6'] },
+            { value: 'cyber-compact', name: '⚡ Cyber Slate & Cyan - Compact', category: 'classic', colors: ['#0f172a', '#06b6d4', '#3b82f6'] },
+            { value: 'crimson-luxury', name: '🍷 Crimson Premium & Platinum', category: 'classic', colors: ['#991b1b', '#4b5563', '#dc2626'] },
+            { value: 'crimson-compact', name: '🍷 Crimson Premium - Compact', category: 'classic', colors: ['#991b1b', '#4b5563', '#dc2626'] },
+            { value: 'vintage-bronze', name: '🏺 Antique Amber & Rich Bronze', category: 'classic', colors: ['#451a03', '#d97706', '#b45309'] },
+            { value: 'vintage-compact', name: '🏺 Antique Amber & Bronze - Compact', category: 'classic', colors: ['#451a03', '#d97706', '#b45309'] },
+            { value: 'lavender-dusk', name: '🔮 Lavender Dusk & Royal Indigo', category: 'classic', colors: ['#1e1b4b', '#a78bfa', '#6d28d9'] },
+            { value: 'lavender-compact', name: '🔮 Lavender Dusk & Indigo - Compact', category: 'classic', colors: ['#1e1b4b', '#a78bfa', '#6d28d9'] },
+            { value: 'sand-espresso', name: '☕ Golden Sand & Rich Espresso', category: 'classic', colors: ['#271a15', '#c5a880', '#8a5e38'] },
+            { value: 'espresso-compact', name: '☕ Golden Sand & Espresso - Compact', category: 'classic', colors: ['#271a15', '#c5a880', '#8a5e38'] },
+
+            { value: 'mono-classic', name: '🖨️ Mono High Contrast (Ink-Saver)', category: 'print', colors: ['#111111', '#6b7280', '#000000'] },
+            { value: 'mono-compact', name: '🖨️ Mono High Contrast - Compact', category: 'print', colors: ['#111111', '#6b7280', '#000000'] },
+            { value: 'print-navy', name: '🖨️ Elegant Print Navy (Ink-Saver)', category: 'print', colors: ['#0f172a', '#64748b', '#1e3a8a'] },
+            { value: 'print-navy-compact', name: '🖨️ Elegant Print Navy - Compact', category: 'print', colors: ['#0f172a', '#64748b', '#1e3a8a'] },
+            { value: 'print-teal', name: '🖨️ Professional Print Teal (Ink-Saver)', category: 'print', colors: ['#115e59', '#4b5563', '#0f766e'] },
+            { value: 'print-teal-compact', name: '🖨️ Professional Print Teal - Compact', category: 'print', colors: ['#115e59', '#4b5563', '#0f766e'] },
+            { value: 'print-burgundy', name: '🖨️ Deep Print Burgundy (Ink-Saver)', category: 'print', colors: ['#581c25', '#881337', '#701a2c'] },
+            { value: 'print-burgundy-compact', name: '🖨️ Deep Print Burgundy - Compact', category: 'print', colors: ['#581c25', '#881337', '#701a2c'] },
+
+            { value: 'cyber-synth', name: '🔮 Morphing Cyber Synthwave', category: 'morphing', colors: ['#0c0721', '#ff007f', '#00f0ff'] },
+            { value: 'synth-compact', name: '🔮 Cyber Synthwave - Compact', category: 'morphing', colors: ['#0c0721', '#ff007f', '#00f0ff'] },
+            { value: 'origami-slate', name: '📐 Morphing Modern Origami', category: 'morphing', colors: ['#1e293b', '#94a3b8', '#0f766e'] },
+            { value: 'origami-compact', name: '📐 Modern Origami - Compact', category: 'morphing', colors: ['#1e293b', '#94a3b8', '#0f766e'] },
+            { value: 'royal-durbar', name: '👑 Morphing Royal Durbar', category: 'morphing', colors: ['#7c2d12', '#d97706', '#ea580c'] },
+            { value: 'durbar-compact', name: '👑 Royal Durbar - Compact', category: 'morphing', colors: ['#7c2d12', '#d97706', '#ea580c'] },
+            { value: 'emerald-empire', name: '🔱 Morphing Emerald Empire', category: 'morphing', colors: ['#064e3b', '#d97706', '#059669'] },
+            { value: 'empire-compact', name: '🔱 Emerald Empire - Compact', category: 'morphing', colors: ['#064e3b', '#d97706', '#059669'] },
+            { value: 'gothic-velvet', name: '🏰 Morphing Gothic Velvet', category: 'morphing', colors: ['#2e1065', '#b45309', '#db2777'] },
+            { value: 'velvet-compact', name: '🏰 Gothic Velvet - Compact', category: 'morphing', colors: ['#2e1065', '#b45309', '#db2777'] },
+            { value: 'kyoto-zen', name: '⛩️ Morphing Kyoto Zen', category: 'morphing', colors: ['#991b1b', '#fbcfe8', '#4b5563'] },
+            { value: 'zen-compact', name: '⛩️ Kyoto Zen - Compact', category: 'morphing', colors: ['#991b1b', '#fbcfe8', '#4b5563'] }
+        ];
+
+        // Load pinned themes from localStorage
+        let pinnedList = JSON.parse(localStorage.getItem('samyak-pinned-themes') || '["maroon-gold", "maroon-compact", "minimal-compact", "royal-durbar"]');
+
+        function savePinnedThemes() {
+            localStorage.setItem('samyak-pinned-themes', JSON.stringify(pinnedList));
+        }
+
+        // Render the dropdown panel list dynamically
+        function renderDropdownList(searchQuery = '') {
+            listContainer.innerHTML = '';
+            const query = searchQuery.trim().toLowerCase();
+
+            // 1. Group pinned themes together at the very top!
+            const pinnedObjects = themes.filter(t => pinnedList.includes(t.value));
+            const filteredPinned = pinnedObjects.filter(t => t.name.toLowerCase().includes(query));
+
+            if (filteredPinned.length > 0) {
+                const section = createSectionElement('📌 Pinned Themes', filteredPinned);
+                listContainer.appendChild(section);
+            }
+
+            // 2. Classify other themes by categories
+            const categories = [
+                { id: 'morphing', name: '🎭 Shape-Morphing Themes' },
+                { id: 'print', name: '🖨️ Print-Friendly Themes' },
+                { id: 'classic', name: '✨ Classic Themes' }
+            ];
+
+            categories.forEach(cat => {
+                const catThemes = themes.filter(t => t.category === cat.id && !pinnedList.includes(t.value));
+                const filteredCatThemes = catThemes.filter(t => t.name.toLowerCase().includes(query));
+
+                if (filteredCatThemes.length > 0) {
+                    const section = createSectionElement(cat.name, filteredCatThemes);
+                    listContainer.appendChild(section);
+                }
+            });
+
+            // If absolutely nothing matches the query
+            if (listContainer.children.length === 0) {
+                const noResult = document.createElement('div');
+                noResult.className = 'theme-group-title';
+                noResult.style.textAlign = 'center';
+                noResult.style.padding = '20px 10px';
+                noResult.style.border = 'none';
+                noResult.textContent = '❌ No themes found';
+                listContainer.appendChild(noResult);
+            }
+        }
+
+        function createSectionElement(title, items) {
+            const section = document.createElement('div');
+            section.className = 'theme-group-section';
+
+            const sectionTitle = document.createElement('div');
+            sectionTitle.className = 'theme-group-title';
+            sectionTitle.textContent = title;
+            section.appendChild(sectionTitle);
+
+            items.forEach(theme => {
+                const item = document.createElement('div');
+                item.className = 'theme-item';
+                if (nativeSelect.value === theme.value) {
+                    item.classList.add('active');
+                }
+                item.setAttribute('data-theme', theme.value);
+
+                // Preview dots
+                const dots = document.createElement('div');
+                dots.className = 'theme-dots';
+                theme.colors.forEach(col => {
+                    const dot = document.createElement('span');
+                    dot.className = 'theme-dot';
+                    dot.style.backgroundColor = col;
+                    dots.appendChild(dot);
+                });
+                item.appendChild(dots);
+
+                // Name
+                const name = document.createElement('span');
+                name.className = 'theme-name';
+                name.textContent = theme.name;
+                item.appendChild(name);
+
+                // Pin button
+                const pinBtn = document.createElement('button');
+                pinBtn.className = 'theme-pin-btn';
+                if (pinnedList.includes(theme.value)) {
+                    pinBtn.classList.add('pinned');
+                }
+                pinBtn.textContent = '📌';
+                pinBtn.setAttribute('data-theme-id', theme.value);
+                pinBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    togglePinTheme(theme.value);
+                });
+                item.appendChild(pinBtn);
+
+                // Select Theme Action on click
+                item.addEventListener('click', () => {
+                    selectTheme(theme.value);
+                });
+
+                section.appendChild(item);
+            });
+
+            return section;
+        }
+
+        function togglePinTheme(themeValue) {
+            const idx = pinnedList.indexOf(themeValue);
+            if (idx > -1) {
+                pinnedList.splice(idx, 1);
+            } else {
+                pinnedList.push(themeValue);
+            }
+            savePinnedThemes();
+            renderDropdownList(searchInput.value);
+        }
+
+        function selectTheme(themeValue) {
+            nativeSelect.value = themeValue;
+            nativeSelect.dispatchEvent(new Event('change'));
+            dropdown.style.display = 'none';
+        }
+
+        // Toggle dropdown open/close
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.style.display === 'flex';
+            if (isOpen) {
+                dropdown.style.display = 'none';
+            } else {
+                // Close other panels if open
+                dropdown.style.display = 'flex';
+                searchInput.value = '';
+                searchInput.focus();
+                renderDropdownList();
+            }
+        });
+
+        // Search filtering
+        searchInput.addEventListener('input', () => {
+            renderDropdownList(searchInput.value);
+        });
+
+        // Close on clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && e.target !== trigger) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Sync custom dropdown active highlight whenever nativeSelect is changed (e.g. workspace load)
+        nativeSelect.addEventListener('change', () => {
+            // Update active state in visual items
+            const activeItems = listContainer.querySelectorAll('.theme-item');
+            activeItems.forEach(item => {
+                const themeVal = item.getAttribute('data-theme');
+                if (themeVal === nativeSelect.value) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+
+        // Initialize render
+        renderDropdownList();
+    })();
 });
