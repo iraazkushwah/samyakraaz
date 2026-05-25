@@ -271,6 +271,110 @@ body.theme-kyoto-zen, body.theme-zen-compact {
     --heading-color: #7f1d1d;
 }
 
+/* ==========================================
+   10 BRAND-NEW ULTRA-PREMIUM THEMES
+   ========================================== */
+
+/* 1. Gothic Royal Black */
+body.theme-gothic-royal, body.theme-royal-compact-v2 {
+    --primary-color: #4a0e17;      /* Gothic Burgundy */
+    --secondary-color: #b8860b;    /* Rich Antique Gold */
+    --accent-color: #1a1a1a;       /* Charcoal Accent */
+    --page-bg: #fffdf9;            /* Vintage Cream Parchment */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #4a0e17;
+}
+
+/* 2. Zen Kyoto & Ink */
+body.theme-kyoto-ink, body.theme-kyoto-compact-ink {
+    --primary-color: #111111;      /* Sumi Ink Black */
+    --secondary-color: #b22222;    /* Lacquer Crimson Red */
+    --accent-color: #cda557;       /* Kyoto Blossom Gold */
+    --page-bg: #fdfcf7;            /* Textured Off-White Washi Paper */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #111111;
+}
+
+/* 3. Athenian Temple Gold */
+body.theme-athenian-gold, body.theme-athenian-compact-v2 {
+    --primary-color: #0b2240;      /* Deep Athenian Blue */
+    --secondary-color: #c5a059;    /* Hellenic Temple Gold */
+    --accent-color: #4a5d3e;       /* Olive Accent */
+    --page-bg: #fffefa;            /* Classical Marble Ivory */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #0b2240;
+}
+
+/* 4. Warm Autumn Vintage */
+body.theme-autumn-vintage, body.theme-autumn-compact-v2 {
+    --primary-color: #5c2e16;      /* Warm Copper Brown */
+    --secondary-color: #d48227;    /* Spiced Amber Gold */
+    --accent-color: #1a4329;       /* Forest Evergreen */
+    --page-bg: #fefaf4;            /* Oatmeal Cream */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #5c2e16;
+}
+
+/* 5. Maharaja Palace Gold */
+body.theme-maharaja-gold, body.theme-maharaja-compact-v2 {
+    --primary-color: #800020;      /* Palace Crimson */
+    --secondary-color: #e6a100;    /* Marigold Gold */
+    --accent-color: #008080;       /* Velvet Turquoise */
+    --page-bg: #fffdf0;            /* Palace Cream */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #800020;
+}
+
+/* 6. Baroque Victorian Prestige */
+body.theme-victorian-prestige, body.theme-victorian-compact-v2 {
+    --primary-color: #004743;      /* Forest Teal */
+    --secondary-color: #a3761a;    /* Antique Bronze Gold */
+    --accent-color: #8b1e3f;       /* Crimson Rose */
+    --page-bg: #fafaf8;            /* Alabaster Silk */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #004743;
+}
+
+/* 7. Neo-Gothic Obsidian */
+body.theme-neo-gothic, body.theme-neo-gothic-compact {
+    --primary-color: #1a1a1a;      /* Obsidian Black */
+    --secondary-color: #e8a838;    /* Cyber Amber Gold */
+    --accent-color: #ab4b3c;       /* Muted Copper Red */
+    --page-bg: #f2f4f7;            /* Cool Stone Grey */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #1a1a1a;
+}
+
+/* 8. Royal Sapphire Luxury */
+body.theme-royal-sapphire, body.theme-sapphire-compact-v2 {
+    --primary-color: #0f2b5c;      /* Royal Sapphire Blue */
+    --secondary-color: #d4af37;    /* Shimmering Gold */
+    --accent-color: #5c6b73;       /* Platinum Grey */
+    --page-bg: #f5f8fa;            /* Cool Ice White */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #0f2b5c;
+}
+
+/* 9. Imperial Jade Emperor */
+body.theme-jade-emperor, body.theme-jade-compact-v2 {
+    --primary-color: #0c3d2e;      /* Imperial Jade Green */
+    --secondary-color: #d4af37;    /* Golden Seal Gold */
+    --accent-color: #5a8f7b;       /* Sage Accent */
+    --page-bg: #faf8f0;            /* Ancient Silk Parchment */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #0c3d2e;
+}
+
+/* 10. Sun-Drenched Vintage Oasis */
+body.theme-vintage-oasis, body.theme-oasis-compact-v2 {
+    --primary-color: #8a4b2d;      /* Desert Clay Brown */
+    --secondary-color: #c9a25d;    /* Sand Gold */
+    --accent-color: #3a5f43;       /* Palm Sage Green */
+    --page-bg: #fefcf5;            /* Desert Sand Gold White */
+    --text-color: #000000;         /* Jet Black Text */
+    --heading-color: #8a4b2d;
+}
+
 /* Super Compact spacing overrides when any compact theme is active */
 body.theme-minimal-compact .section-heading-bar,
 body.theme-maroon-compact .section-heading-bar,
@@ -292,7 +396,17 @@ body.theme-origami-compact .section-heading-bar,
 body.theme-durbar-compact .section-heading-bar,
 body.theme-empire-compact .section-heading-bar,
 body.theme-velvet-compact .section-heading-bar,
-body.theme-zen-compact .section-heading-bar {
+body.theme-zen-compact .section-heading-bar,
+body.theme-royal-compact-v2 .section-heading-bar,
+body.theme-kyoto-compact-ink .section-heading-bar,
+body.theme-athenian-compact-v2 .section-heading-bar,
+body.theme-autumn-compact-v2 .section-heading-bar,
+body.theme-maharaja-compact-v2 .section-heading-bar,
+body.theme-victorian-compact-v2 .section-heading-bar,
+body.theme-neo-gothic-compact .section-heading-bar,
+body.theme-sapphire-compact-v2 .section-heading-bar,
+body.theme-jade-compact-v2 .section-heading-bar,
+body.theme-oasis-compact-v2 .section-heading-bar {
     padding: 3px 10px !important;
     margin: 3px 0 !important;
     font-size: calc(var(--custom-section-size) - 1.5px) !important;
@@ -318,7 +432,17 @@ body.theme-origami-compact .topic-container,
 body.theme-durbar-compact .topic-container,
 body.theme-empire-compact .topic-container,
 body.theme-velvet-compact .topic-container,
-body.theme-zen-compact .topic-container {
+body.theme-zen-compact .topic-container,
+body.theme-royal-compact-v2 .topic-container,
+body.theme-kyoto-compact-ink .topic-container,
+body.theme-athenian-compact-v2 .topic-container,
+body.theme-autumn-compact-v2 .topic-container,
+body.theme-maharaja-compact-v2 .topic-container,
+body.theme-victorian-compact-v2 .topic-container,
+body.theme-neo-gothic-compact .topic-container,
+body.theme-sapphire-compact-v2 .topic-container,
+body.theme-jade-compact-v2 .topic-container,
+body.theme-oasis-compact-v2 .topic-container {
     margin-top: 2px !important;
     margin-bottom: 1px !important;
 }
@@ -343,7 +467,17 @@ body.theme-origami-compact .topic-title,
 body.theme-durbar-compact .topic-title,
 body.theme-empire-compact .topic-title,
 body.theme-velvet-compact .topic-title,
-body.theme-zen-compact .topic-title {
+body.theme-zen-compact .topic-title,
+body.theme-royal-compact-v2 .topic-title,
+body.theme-kyoto-compact-ink .topic-title,
+body.theme-athenian-compact-v2 .topic-title,
+body.theme-autumn-compact-v2 .topic-title,
+body.theme-maharaja-compact-v2 .topic-title,
+body.theme-victorian-compact-v2 .topic-title,
+body.theme-neo-gothic-compact .topic-title,
+body.theme-sapphire-compact-v2 .topic-title,
+body.theme-jade-compact-v2 .topic-title,
+body.theme-oasis-compact-v2 .topic-title {
     font-size: calc(var(--custom-topic-size) - 1px) !important;
     padding-bottom: 1px !important;
 }
@@ -368,7 +502,17 @@ body.theme-origami-compact .premium-box,
 body.theme-durbar-compact .premium-box,
 body.theme-empire-compact .premium-box,
 body.theme-velvet-compact .premium-box,
-body.theme-zen-compact .premium-box {
+body.theme-zen-compact .premium-box,
+body.theme-royal-compact-v2 .premium-box,
+body.theme-kyoto-compact-ink .premium-box,
+body.theme-athenian-compact-v2 .premium-box,
+body.theme-autumn-compact-v2 .premium-box,
+body.theme-maharaja-compact-v2 .premium-box,
+body.theme-victorian-compact-v2 .premium-box,
+body.theme-neo-gothic-compact .premium-box,
+body.theme-sapphire-compact-v2 .premium-box,
+body.theme-jade-compact-v2 .premium-box,
+body.theme-oasis-compact-v2 .premium-box {
     margin: 3px 0 !important;
     padding: 6px 12px !important;
 }
@@ -393,7 +537,17 @@ body.theme-origami-compact .highlight-box,
 body.theme-durbar-compact .highlight-box,
 body.theme-empire-compact .highlight-box,
 body.theme-velvet-compact .highlight-box,
-body.theme-zen-compact .highlight-box {
+body.theme-zen-compact .highlight-box,
+body.theme-royal-compact-v2 .highlight-box,
+body.theme-kyoto-compact-ink .highlight-box,
+body.theme-athenian-compact-v2 .highlight-box,
+body.theme-autumn-compact-v2 .highlight-box,
+body.theme-maharaja-compact-v2 .highlight-box,
+body.theme-victorian-compact-v2 .highlight-box,
+body.theme-neo-gothic-compact .highlight-box,
+body.theme-sapphire-compact-v2 .highlight-box,
+body.theme-jade-compact-v2 .highlight-box,
+body.theme-oasis-compact-v2 .highlight-box {
     margin: 2px 0 !important;
     padding: 4px 8px !important;
 }
@@ -418,7 +572,17 @@ body.theme-origami-compact p.body-text,
 body.theme-durbar-compact p.body-text,
 body.theme-empire-compact p.body-text,
 body.theme-velvet-compact p.body-text,
-body.theme-zen-compact p.body-text {
+body.theme-zen-compact p.body-text,
+body.theme-royal-compact-v2 p.body-text,
+body.theme-kyoto-compact-ink p.body-text,
+body.theme-athenian-compact-v2 p.body-text,
+body.theme-autumn-compact-v2 p.body-text,
+body.theme-maharaja-compact-v2 p.body-text,
+body.theme-victorian-compact-v2 p.body-text,
+body.theme-neo-gothic-compact p.body-text,
+body.theme-sapphire-compact-v2 p.body-text,
+body.theme-jade-compact-v2 p.body-text,
+body.theme-oasis-compact-v2 p.body-text {
     margin-bottom: 2px !important;
     line-height: 1.3 !important;
 }
@@ -443,7 +607,17 @@ body.theme-origami-compact .bullet-list,
 body.theme-durbar-compact .bullet-list,
 body.theme-empire-compact .bullet-list,
 body.theme-velvet-compact .bullet-list,
-body.theme-zen-compact .bullet-list {
+body.theme-zen-compact .bullet-list,
+body.theme-royal-compact-v2 .bullet-list,
+body.theme-kyoto-compact-ink .bullet-list,
+body.theme-athenian-compact-v2 .bullet-list,
+body.theme-autumn-compact-v2 .bullet-list,
+body.theme-maharaja-compact-v2 .bullet-list,
+body.theme-victorian-compact-v2 .bullet-list,
+body.theme-neo-gothic-compact .bullet-list,
+body.theme-sapphire-compact-v2 .bullet-list,
+body.theme-jade-compact-v2 .bullet-list,
+body.theme-oasis-compact-v2 .bullet-list {
     gap: 2px !important;
 }
 
@@ -467,7 +641,17 @@ body.theme-origami-compact .bullet-item,
 body.theme-durbar-compact .bullet-item,
 body.theme-empire-compact .bullet-item,
 body.theme-velvet-compact .bullet-item,
-body.theme-zen-compact .bullet-item {
+body.theme-zen-compact .bullet-item,
+body.theme-royal-compact-v2 .bullet-item,
+body.theme-kyoto-compact-ink .bullet-item,
+body.theme-athenian-compact-v2 .bullet-item,
+body.theme-autumn-compact-v2 .bullet-item,
+body.theme-maharaja-compact-v2 .bullet-item,
+body.theme-victorian-compact-v2 .bullet-item,
+body.theme-neo-gothic-compact .bullet-item,
+body.theme-sapphire-compact-v2 .bullet-item,
+body.theme-jade-compact-v2 .bullet-item,
+body.theme-oasis-compact-v2 .bullet-item {
     line-height: 1.3 !important;
 }
 
@@ -516,8 +700,9 @@ body {
 /* Editor Panel (Left Sidebar) */
 .editor-panel {
     position: relative;
-    width: 480px;
+    width: 40vw; /* 40% of viewport width on laptops */
     min-width: 380px;
+    max-width: 45vw; /* Prevent panel from growing too large */
     flex-shrink: 0;
     background-color: var(--ui-sidebar-bg);
     border-right: none;
@@ -989,8 +1174,9 @@ body {
     gap: 4px;
     padding-bottom: 8px;
     border-bottom: 1px solid var(--ui-border);
-    overflow-x: auto;
+    overflow: hidden;
     white-space: nowrap;
+    flex-wrap: nowrap;
     scrollbar-width: none; /* Hide scrollbar Firefox */
     -ms-overflow-style: none; /* Hide scrollbar IE */
     flex-shrink: 0;
@@ -1061,6 +1247,96 @@ body {
     padding: 6px;
 }
 
+/* Toolbar Collapsible Tray Drawer (Windows-Style System Tray) */
+.toolbar-tray-drawer {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    max-width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+}
+
+.toolbar-tray-drawer.open {
+    max-width: 400px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.tray-trigger-btn {
+    transition: transform 0.3s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.tray-trigger-btn.open {
+    transform: rotate(180deg);
+}
+
+/* Customize Edit Mode for Toolbar */
+.editor-toolbar.customize-mode .tool-btn:not(#toolbar-customize-trigger):not(#toolbar-tray-trigger),
+.editor-toolbar.customize-mode .tool-btn-select {
+    position: relative;
+    border: 1.5px dashed var(--ui-accent, #1d6ea5) !important;
+    animation: customizePulse 1.5s infinite alternate;
+}
+
+@keyframes customizePulse {
+    0% { border-color: rgba(29, 110, 165, 0.4); box-shadow: 0 0 2px rgba(29, 110, 165, 0.2); }
+    100% { border-color: rgba(29, 110, 165, 1); box-shadow: 0 0 6px rgba(29, 110, 165, 0.6); }
+}
+
+/* Badge for items in the main toolbar (click to move to tray) */
+.editor-toolbar.customize-mode > .tool-btn:not(#toolbar-customize-trigger):not(#toolbar-tray-trigger)::after {
+    content: "📥";
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: 8px;
+    background: #e03131;
+    color: white;
+    border-radius: 50%;
+    width: 13px;
+    height: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+/* Badge for items in the tray drawer (click to move out to toolbar) */
+.editor-toolbar.customize-mode .toolbar-tray-drawer > .tool-btn::after {
+    content: "📤";
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: 8px;
+    background: #2f9e44;
+    color: white;
+    border-radius: 50%;
+    width: 13px;
+    height: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+/* Make customize button active state stand out */
+#toolbar-customize-trigger.active {
+    background-color: var(--ui-success, #2f9e44) !important;
+    border-color: var(--ui-success, #2f9e44) !important;
+    color: white !important;
+    animation: successPulse 1s infinite alternate;
+}
+
+@keyframes successPulse {
+    0% { box-shadow: 0 0 2px rgba(47, 158, 68, 0.4); }
+    100% { box-shadow: 0 0 8px rgba(47, 158, 68, 0.8); }
+}
+
 .textarea-wrapper {
     flex: 1;
     min-height: 0;
@@ -1121,38 +1397,37 @@ body.light-mode #page-content-input::-webkit-scrollbar-thumb:hover {
 
 /* Floating Editor Actions Menu & Stats */
 .floating-editor-controls {
-    position: absolute;
-    bottom: 8px;
-    left: 8px;
-    right: 8px;
+    position: fixed;
+    bottom: 12px; /* Raised slightly for better visibility in landscape mobile */
+    left: 12px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-end;
     pointer-events: none;
-    z-index: 100;
+    z-index: 1000 !important; /* Extremely high stack order to prevent overlap on mobile */
 }
 
 .fab-container {
     position: relative;
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Horizontal alignment */
     align-items: center;
     pointer-events: auto;
 }
 
 /* 3D Trigger Button Styling */
 .fab-trigger-btn {
-    width: 34px;
-    height: 34px;
+    width: 50px; /* Increased size for mobile-friendly touch targets */
+    height: 50px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--ui-accent) 0%, #6366f1 100%);
     border: none;
     color: white;
-    font-size: 13px;
+    font-size: 20px; /* Larger icon */
     cursor: pointer;
-    box-shadow: 0 3px 8px rgba(79, 70, 229, 0.4), 
-                inset 0 -2px 0 rgba(0, 0, 0, 0.2), 
-                inset 0 1.5px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4), 
+                inset 0 -2.5px 0 rgba(0, 0, 0, 0.2), 
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1163,29 +1438,30 @@ body.light-mode #page-content-input::-webkit-scrollbar-thumb:hover {
 }
 
 .fab-trigger-btn:hover {
-    transform: translateY(-1.5px);
-    box-shadow: 0 5px 12px rgba(79, 70, 229, 0.5), 
-                inset 0 -2px 0 rgba(0, 0, 0, 0.2), 
-                inset 0 1.5px 0 rgba(255, 255, 255, 0.3);
+    transform: scale(1.05); /* Soft scale hover on mobile/desktop */
+    box-shadow: 0 6px 15px rgba(79, 70, 229, 0.5), 
+                inset 0 -2.5px 0 rgba(0, 0, 0, 0.2), 
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
 }
 
 .fab-trigger-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.4), 
-                inset 0 -1px 0 rgba(0, 0, 0, 0.1), 
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: scale(0.95); /* Deep click feel */
+    box-shadow: 0 2px 5px rgba(79, 70, 229, 0.4), 
+                inset 0 -1.5px 0 rgba(0, 0, 0, 0.1), 
+                inset 0 1.5px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Sub-buttons vertical menu styling */
+/* Sub-buttons horizontal menu styling */
 .fab-menu-items {
     position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(10px) scale(0.8);
+    bottom: auto;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(-15px) scale(0.8);
     display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 8px;
+    flex-direction: row; /* Horizontal layout! */
+    gap: 12px; /* Generous gap between icons so it is easy to click on mobile */
+    margin-left: 12px; /* Margin from main trigger */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
@@ -1195,35 +1471,35 @@ body.light-mode #page-content-input::-webkit-scrollbar-thumb:hover {
     align-items: center;
 }
 
-/* Active Open State */
+/* Active Open State - Slides out Horizontally */
 .fab-container.open .fab-menu-items {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0) scale(1);
+    transform: translateY(-50%) translateX(0) scale(1);
 }
 
 .fab-container.open .fab-trigger-btn {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.4), 
-                inset 0 -2px 0 rgba(239, 68, 68, 0.2), 
-                inset 0 1.5px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4), 
+                inset 0 -2.5px 0 rgba(239, 68, 68, 0.2), 
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Sub-button 3D styling */
 .fab-sub-btn {
-    width: 28px;
-    height: 28px;
+    width: 44px; /* Enlarged sub-buttons for high visibility and touch accuracy */
+    height: 44px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 16px; /* Larger emojis inside */
     transition: var(--transition-smooth);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 
-                inset 0 -1.5px 0 rgba(0, 0, 0, 0.15), 
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 
+                inset 0 -2px 0 rgba(0, 0, 0, 0.15), 
+                inset 0 1.5px 0 rgba(255, 255, 255, 0.2);
     outline: none;
 }
 
@@ -1232,25 +1508,31 @@ body.light-mode #page-content-input::-webkit-scrollbar-thumb:hover {
 }
 
 .fab-sub-btn.btn-secondary {
-    background-color: var(--ui-card-bg);
-    border: 1px solid var(--ui-border);
-    color: var(--ui-text);
+    background-color: #212529 !important; /* Solid dark charcoal (100% opaque) */
+    border: 1.5px solid var(--ui-accent) !important; /* Accent-colored solid border */
+    color: #ffffff !important;
+}
+
+.fab-sub-btn.btn-secondary:hover {
+    background-color: var(--ui-accent) !important;
 }
 
 .fab-sub-btn.btn-clear {
-    background-color: rgba(239, 68, 68, 0.1) !important;
-    border: 1px solid rgba(239, 68, 68, 0.3) !important;
-    color: #fca5a5 !important;
+    background-color: #e03131 !important; /* Solid vibrant red (100% opaque) */
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 3px 8px rgba(224, 49, 49, 0.4), 
+                inset 0 -2px 0 rgba(0, 0, 0, 0.2), 
+                inset 0 1.5px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
 .fab-sub-btn.btn-clear:hover {
-    background-color: rgba(239, 68, 68, 0.25) !important;
-    color: #fff !important;
+    background-color: #c92a2a !important; /* Solid darker red on hover */
 }
 
 .fab-sub-btn.btn-primary {
-    background-color: var(--ui-accent);
-    color: #fff;
+    background-color: var(--ui-accent) !important;
+    color: #ffffff !important;
 }
 
 /* Floating Stats Styling */
@@ -1719,6 +2001,38 @@ a.footer-social-link:hover {
     box-sizing: border-box; /* Crucial to prevent horizontal scrollbars on 100% width */
 }
 
+/* Custom Section Heading Shapes */
+.section-heading-bar[data-shape="rounded"] {
+    border-radius: 6px !important;
+}
+.section-heading-bar[data-shape="pill"] {
+    border-radius: 30px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+.section-heading-bar[data-shape="left-stripe"] {
+    background-color: transparent !important;
+    color: var(--custom-section-bg) !important;
+    box-shadow: none !important;
+    border-left: 6px solid var(--custom-section-bg) !important;
+    border-bottom: 1.5px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 0 !important;
+    padding-left: 10px !important;
+    padding-right: 0 !important;
+    padding-bottom: 4px !important;
+}
+.section-heading-bar[data-shape="underline"] {
+    background-color: transparent !important;
+    color: var(--custom-section-bg) !important;
+    box-shadow: none !important;
+    border-left: none !important;
+    border-bottom: 3px solid var(--custom-section-bg) !important;
+    border-radius: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 4px !important;
+}
+
 /* Topic Heading (Fully customizable via the 4th Control Panel Section) */
 .topic-container {
     margin-top: var(--custom-topic-margin-top);
@@ -1786,6 +2100,28 @@ a.footer-social-link:hover {
     left: 2px;
     top: -1px;
     font-weight: 900;
+}
+
+/* Custom Bullet List Styles */
+.bullet-list[data-bullet-style="diamond"] .bullet-item::before {
+    content: "◆";
+    font-size: 12px;
+    top: 2px;
+}
+.bullet-list[data-bullet-style="square"] .bullet-item::before {
+    content: "■";
+    font-size: 11px;
+    top: 2px;
+}
+.bullet-list[data-bullet-style="arrow"] .bullet-item::before {
+    content: "➜";
+    font-size: 12px;
+    top: 1px;
+}
+.bullet-list[data-bullet-style="checkmark"] .bullet-item::before {
+    content: "✔";
+    font-size: 12px;
+    top: 1px;
 }
 
 /* Highlight boxes */
@@ -2147,7 +2483,7 @@ strong {
         height: auto !important;
     }
     
-    .editor-panel, .preview-header, .floating-stats {
+    .editor-panel, .preview-header, .floating-stats, .floating-editor-controls, .fab-container, .fab-trigger-btn, .fab-sub-btn, .resize-handle, .sidebar-toggle-btn {
         display: none !important;
     }
     
@@ -2941,11 +3277,30 @@ body.light-mode .search-replace-panel {
     break-inside: avoid-column; /* Prevent elements from splitting halfway across columns */
 }
 
+/* Allow paragraphs and bullet lists to break across columns to fill gaps and look compact */
+.page-content.layout-two-column > p.body-text,
+.page-content.layout-two-column > .bullet-list {
+    break-inside: auto;
+}
+
+.page-content.layout-two-column .bullet-list > .bullet-item {
+    break-inside: avoid-column; /* Keep individual list items whole so a single bullet isn't split across columns */
+}
+
 .page-content.layout-two-column .section-heading-bar {
-    column-span: all;
-    display: block !important; /* Ensure it is a block container to span columns */
+    column-span: none;
+    display: block !important; /* Ensure it is a block container */
     width: 100% !important;
     max-width: 100% !important;
+}
+
+/* Manual Column Break element */
+.column-break {
+    break-before: column !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
 }
 
 /* ==========================================================================
@@ -3248,6 +3603,590 @@ body.theme-midnight-gold .topic-title {
     border-top: none !important;
     width: 100% !important;
     justify-content: flex-start !important;
+}
+
+/* ==========================================================
+   CUSTOM BULLET STYLES FOR 10 PREMIUM THEMES
+   ========================================================== */
+
+/* 1. Gothic Royal Black: Gothic Diamond Star (✦) */
+body.theme-gothic-royal .bullet-item::before,
+body.theme-royal-compact-v2 .bullet-item::before {
+    content: "✦" !important;
+    font-size: 15px !important;
+    color: var(--secondary-color) !important;
+    top: 0px !important;
+    left: 2px !important;
+}
+
+/* 2. Zen Kyoto & Ink: Kyoto Zen Mon (◈) */
+body.theme-kyoto-ink .bullet-item::before,
+body.theme-kyoto-compact-ink .bullet-item::before {
+    content: "◈" !important;
+    font-size: 16px !important;
+    color: var(--secondary-color) !important;
+    top: 0px !important;
+    left: 1px !important;
+    font-weight: bold !important;
+}
+
+/* 3. Athenian Temple Gold: Athenian Laurel Leaf (🌿) */
+body.theme-athenian-gold .bullet-item::before,
+body.theme-athenian-compact-v2 .bullet-item::before {
+    content: "🌿" !important;
+    font-size: 14px !important;
+    color: var(--secondary-color) !important;
+    top: 1px !important;
+    left: 1px !important;
+}
+
+/* 4. Warm Autumn Vintage: Autumn Maple Leaf (🍁) */
+body.theme-autumn-vintage .bullet-item::before,
+body.theme-autumn-compact-v2 .bullet-item::before {
+    content: "🍁" !important;
+    font-size: 14px !important;
+    color: var(--secondary-color) !important;
+    top: 1px !important;
+    left: 0px !important;
+}
+
+/* 5. Maharaja Palace Gold: Majestic Gold Star (✦) */
+body.theme-maharaja-gold .bullet-item::before,
+body.theme-maharaja-compact-v2 .bullet-item::before {
+    content: "✦" !important;
+    font-size: 15px !important;
+    color: var(--secondary-color) !important;
+    top: 0px !important;
+    left: 2px !important;
+}
+
+/* 6. Baroque Victorian Prestige: Fountain Pen Nib (✒️) */
+body.theme-victorian-prestige .bullet-item::before,
+body.theme-victorian-compact-v2 .bullet-item::before {
+    content: "✒️" !important;
+    font-size: 14px !important;
+    color: var(--secondary-color) !important;
+    top: 1px !important;
+    left: 2px !important;
+}
+
+/* 7. Neo-Gothic Obsidian: Steampunk/Obsidian Star (★) */
+body.theme-neo-gothic .bullet-item::before,
+body.theme-neo-gothic-compact .bullet-item::before {
+    content: "★" !important;
+    font-size: 14px !important;
+    color: var(--secondary-color) !important;
+    top: 0px !important;
+    left: 2px !important;
+}
+
+/* 8. Royal Sapphire Luxury: Sparkle Magic Star (✨) */
+body.theme-royal-sapphire .bullet-item::before,
+body.theme-sapphire-compact-v2 .bullet-item::before {
+    content: "✨" !important;
+    font-size: 13px !important;
+    color: var(--secondary-color) !important;
+    top: 1px !important;
+    left: 1px !important;
+}
+
+/* 9. Imperial Jade Emperor: Lotus/Cherry Blossom flower (🌸) */
+body.theme-jade-emperor .bullet-item::before,
+body.theme-jade-compact-v2 .bullet-item::before {
+    content: "🌸" !important;
+    font-size: 13px !important;
+    color: var(--secondary-color) !important;
+    top: 1px !important;
+    left: 1px !important;
+}
+
+/* 10. Sun-Drenched Vintage Oasis: Desert Palm Tree (🌴) */
+body.theme-vintage-oasis .bullet-item::before,
+body.theme-oasis-compact-v2 .bullet-item::before {
+    content: "🌴" !important;
+    font-size: 14px !important;
+    color: var(--secondary-color) !important;
+    top: 0px !important;
+    left: 1px !important;
+}
+
+/* ==========================================================
+   SHAPE-SHIFTING TOPIC TITLE ICONS FOR 10 PREMIUM THEMES
+   ========================================================== */
+
+/* 1. Gothic Royal Black: Writing Hand ✍️ */
+body.theme-gothic-royal .topic-title span.diamond,
+body.theme-royal-compact-v2 .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-gothic-royal .topic-title span.diamond::before,
+body.theme-royal-compact-v2 .topic-title span.diamond::before {
+    content: "✍️" !important;
+    font-size: 16px !important;
+}
+
+/* 2. Zen Kyoto & Ink: Calligraphic Sumi Ink Finger ☞ */
+body.theme-kyoto-ink .topic-title span.diamond,
+body.theme-kyoto-compact-ink .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-kyoto-ink .topic-title span.diamond::before,
+body.theme-kyoto-compact-ink .topic-title span.diamond::before {
+    content: "☞" !important;
+    font-size: 19px !important;
+    font-weight: bold !important;
+}
+
+/* 3. Athenian Temple Gold: Gold Pointing Hand 👉 */
+body.theme-athenian-gold .topic-title span.diamond,
+body.theme-athenian-compact-v2 .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-athenian-gold .topic-title span.diamond::before,
+body.theme-athenian-compact-v2 .topic-title span.diamond::before {
+    content: "👉" !important;
+    font-size: 15px !important;
+}
+
+/* 4. Warm Autumn Vintage: Vintage Pointer Finger 👉 */
+body.theme-autumn-vintage .topic-title span.diamond,
+body.theme-autumn-compact-v2 .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-autumn-vintage .topic-title span.diamond::before,
+body.theme-autumn-compact-v2 .topic-title span.diamond::before {
+    content: "👉" !important;
+    font-size: 15px !important;
+}
+
+/* 5. Maharaja Palace Gold: Royal Crown 👑 */
+body.theme-maharaja-gold .topic-title span.diamond,
+body.theme-maharaja-compact-v2 .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-maharaja-gold .topic-title span.diamond::before,
+body.theme-maharaja-compact-v2 .topic-title span.diamond::before {
+    content: "👑" !important;
+    font-size: 16px !important;
+}
+
+/* 6. Baroque Victorian Prestige: Calligraphic Quill Hand ✍️ */
+body.theme-victorian-prestige .topic-title span.diamond,
+body.theme-victorian-compact-v2 .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-victorian-prestige .topic-title span.diamond::before,
+body.theme-victorian-compact-v2 .topic-title span.diamond::before {
+    content: "✍️" !important;
+    font-size: 16px !important;
+}
+
+/* 7. Neo-Gothic Obsidian: Metallic Glove Pointer 🫵 */
+body.theme-neo-gothic .topic-title span.diamond,
+body.theme-neo-gothic-compact .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-neo-gothic .topic-title span.diamond::before,
+body.theme-neo-gothic-compact .topic-title span.diamond::before {
+    content: "🫵" !important;
+    font-size: 16px !important;
+}
+
+/* 8. Royal Sapphire Luxury: Sapphire Royal Pointer 👉 */
+body.theme-royal-sapphire .topic-title span.diamond,
+body.theme-sapphire-compact-v2 .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-royal-sapphire .topic-title span.diamond::before,
+body.theme-sapphire-compact-v2 .topic-title span.diamond::before {
+    content: "👉" !important;
+    font-size: 15px !important;
+}
+
+/* 9. Imperial Jade Emperor: Calligraphic Jade Pointer ☞ */
+body.theme-jade-emperor .topic-title span.diamond,
+body.theme-jade-compact-v2 .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-jade-emperor .topic-title span.diamond::before,
+body.theme-jade-compact-v2 .topic-title span.diamond::before {
+    content: "☞" !important;
+    font-size: 19px !important;
+    font-weight: bold !important;
+}
+
+/* 10. Sun-Drenched Vintage Oasis: Palm Oasis Pointer 👉 */
+body.theme-vintage-oasis .topic-title span.diamond,
+body.theme-oasis-compact-v2 .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-vintage-oasis .topic-title span.diamond::before,
+body.theme-oasis-compact-v2 .topic-title span.diamond::before {
+    content: "👉" !important;
+    font-size: 15px !important;
+}
+
+
+/* ==========================================================
+   10 ULTRA-PREMIUM THEME CUSTOM SHAPE-SHIFTING OVERRIDES
+   ========================================================== */
+
+/* 1. Gothic Royal Black - Heavy Burgundy Shield & Antique Gold Frames */
+body.theme-gothic-royal .section-heading-bar,
+body.theme-gothic-royal .section-title,
+body.theme-royal-compact-v2 .section-heading-bar,
+body.theme-royal-compact-v2 .section-title {
+    background: linear-gradient(135deg, #4a0e17 0%, #290509 100%) !important;
+    color: #fffdf9 !important;
+    border: 2px solid #b8860b !important;
+    border-radius: 4px !important;
+    padding: 6px 20px !important;
+    display: block !important;
+    width: max-content !important;
+    margin: 10px auto !important;
+    text-align: center !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15), inset 0 0 8px rgba(184, 134, 11, 0.3) !important;
+    align-self: center !important;
+}
+body.theme-gothic-royal .topic-title,
+body.theme-royal-compact-v2 .topic-title {
+    color: #4a0e17 !important;
+    background-color: rgba(184, 134, 11, 0.08) !important;
+    border: 1px solid rgba(184, 134, 11, 0.3) !important;
+    border-left: 5px solid #4a0e17 !important;
+    padding: 4px 10px !important;
+    border-radius: 2px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-gothic-royal .highlight-box,
+body.theme-royal-compact-v2 .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid #b8860b !important;
+    border-left: 5px solid #4a0e17 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    color: #000000 !important;
+}
+
+/* 2. Zen Kyoto & Ink - Calligraphy Torii Gates & Brush stroke borders */
+body.theme-kyoto-ink .section-heading-bar,
+body.theme-kyoto-ink .section-title,
+body.theme-kyoto-compact-ink .section-heading-bar,
+body.theme-kyoto-compact-ink .section-title {
+    background: #111111 !important;
+    color: #ffffff !important;
+    border-top: 4px solid #b22222 !important;
+    border-bottom: 4px solid #b22222 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0px !important;
+    padding: 4px 18px !important;
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+body.theme-kyoto-ink .topic-title,
+body.theme-kyoto-compact-ink .topic-title {
+    color: #111111 !important;
+    background-color: rgba(178, 34, 34, 0.05) !important;
+    border: 1px solid #111111 !important;
+    border-left: 6px solid #b22222 !important;
+    padding: 4px 10px !important;
+    border-radius: 0px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-kyoto-ink .highlight-box,
+body.theme-kyoto-compact-ink .highlight-box {
+    background-color: #ffffff !important;
+    border: 2px solid #111111 !important;
+    border-left: 6px solid #b22222 !important;
+    border-radius: 0px !important;
+    color: #000000 !important;
+}
+
+/* 3. Athenian Temple Gold - Greek Marble Columns & Key Patterns */
+body.theme-athenian-gold .section-heading-bar,
+body.theme-athenian-gold .section-title,
+body.theme-athenian-compact-v2 .section-heading-bar,
+body.theme-athenian-compact-v2 .section-title {
+    background: #ffffff !important;
+    color: #0b2240 !important;
+    border-top: 3px solid #c5a059 !important;
+    border-bottom: 3px solid #c5a059 !important;
+    border-left: 8px double #0b2240 !important;
+    border-right: 8px double #0b2240 !important;
+    border-radius: 0px !important;
+    padding: 6px 16px !important;
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04) !important;
+}
+body.theme-athenian-gold .topic-title,
+body.theme-athenian-compact-v2 .topic-title {
+    color: #0b2240 !important;
+    background-color: rgba(197, 160, 89, 0.07) !important;
+    border: 1px dashed #c5a059 !important;
+    border-left: 5px solid #0b2240 !important;
+    padding: 4px 12px !important;
+    border-radius: 0px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-athenian-gold .highlight-box,
+body.theme-athenian-compact-v2 .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid #c5a059 !important;
+    border-left: 5px solid #4a5d3e !important;
+    border-radius: 0px !important;
+    color: #000000 !important;
+}
+
+/* 4. Warm Autumn Vintage - Soft Copper Pills & Evergreen Ribbons */
+body.theme-autumn-vintage .section-heading-bar,
+body.theme-autumn-vintage .section-title,
+body.theme-autumn-compact-v2 .section-heading-bar,
+body.theme-autumn-compact-v2 .section-title {
+    background: #5c2e16 !important;
+    color: #fefaf4 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: 3px solid #d48227 !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 5px 20px !important;
+    display: block !important;
+    width: 100% !important;
+}
+body.theme-autumn-vintage .topic-title,
+body.theme-autumn-compact-v2 .topic-title {
+    color: #5c2e16 !important;
+    background-color: rgba(26, 67, 41, 0.06) !important;
+    border: 1px solid rgba(212, 130, 39, 0.3) !important;
+    border-radius: 8px !important;
+    border-left: 5px solid #1a4329 !important;
+    padding: 4px 10px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-autumn-vintage .highlight-box,
+body.theme-autumn-compact-v2 .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(92, 46, 22, 0.2) !important;
+    border-left: 5px solid #d48227 !important;
+    border-radius: 8px !important;
+    color: #0b0b0b !important;
+}
+
+/* 5. Maharaja Palace Gold - Royal Arch Scrolls & Marigold Lace */
+body.theme-maharaja-gold .section-heading-bar,
+body.theme-maharaja-gold .section-title,
+body.theme-maharaja-compact-v2 .section-heading-bar,
+body.theme-maharaja-compact-v2 .section-title {
+    background: #800020 !important;
+    color: #fffdf0 !important;
+    border: 2px solid #e6a100 !important;
+    border-radius: 20px 4px 20px 4px !important;
+    padding: 6px 22px !important;
+    display: block !important;
+    width: max-content !important;
+    margin: 8px auto !important;
+    box-shadow: 0 4px 12px rgba(128, 0, 32, 0.15) !important;
+    align-self: center !important;
+}
+body.theme-maharaja-gold .topic-title,
+body.theme-maharaja-compact-v2 .topic-title {
+    color: #800020 !important;
+    background-color: rgba(230, 161, 0, 0.08) !important;
+    border-bottom: 2px solid #e6a100 !important;
+    border-left: 5px solid #008080 !important;
+    padding: 4px 12px !important;
+    border-radius: 4px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-maharaja-gold .highlight-box,
+body.theme-maharaja-compact-v2 .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(128, 0, 32, 0.2) !important;
+    border-left: 5px solid #e6a100 !important;
+    border-radius: 4px !important;
+    color: #000000 !important;
+}
+
+/* 6. Baroque Victorian Prestige - Ornate Bevel Frames & Teal Velvet */
+body.theme-victorian-prestige .section-heading-bar,
+body.theme-victorian-prestige .section-title,
+body.theme-victorian-compact-v2 .section-heading-bar,
+body.theme-victorian-compact-v2 .section-title {
+    background: #004743 !important;
+    color: #fafaf8 !important;
+    border: 3px double #a3761a !important;
+    border-radius: 0px !important;
+    padding: 8px 18px !important;
+    display: block !important;
+    width: 100% !important;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08) !important;
+}
+body.theme-victorian-prestige .topic-title,
+body.theme-victorian-compact-v2 .topic-title {
+    color: #004743 !important;
+    background-color: rgba(139, 30, 63, 0.05) !important;
+    border: 1px solid rgba(163, 118, 26, 0.3) !important;
+    border-left: 5px solid #8b1e3f !important;
+    padding: 5px 12px !important;
+    border-radius: 0px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-victorian-prestige .highlight-box,
+body.theme-victorian-compact-v2 .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(163, 118, 26, 0.4) !important;
+    border-left: 5px solid #004743 !important;
+    border-radius: 0px !important;
+    color: #050505 !important;
+}
+
+/* 7. Neo-Gothic Obsidian - Angular Polygon Cards & Copper Trim */
+body.theme-neo-gothic .section-heading-bar,
+body.theme-neo-gothic .section-title,
+body.theme-neo-gothic-compact .section-heading-bar,
+body.theme-neo-gothic-compact .section-title {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    border-left: 6px solid #e8a838 !important;
+    border-bottom: 2px solid #ab4b3c !important;
+    border-radius: 0px 8px 8px 0px !important;
+    padding: 6px 16px !important;
+    display: block !important;
+    width: 100% !important;
+}
+body.theme-neo-gothic .topic-title,
+body.theme-neo-gothic-compact .topic-title {
+    color: #1a1a1a !important;
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-left: 5px solid #ab4b3c !important;
+    padding: 4px 10px !important;
+    border-radius: 0px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-neo-gothic .highlight-box,
+body.theme-neo-gothic-compact .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid #1a1a1a !important;
+    border-left: 5px solid #e8a838 !important;
+    border-radius: 0px !important;
+    color: #000000 !important;
+}
+
+/* 8. Royal Sapphire Luxury - Glassmorphic Ribbons & Platinum Glow */
+body.theme-royal-sapphire .section-heading-bar,
+body.theme-royal-sapphire .section-title,
+body.theme-sapphire-compact-v2 .section-heading-bar,
+body.theme-sapphire-compact-v2 .section-title {
+    background: linear-gradient(135deg, #0f2b5c 0%, #1a3c73 100%) !important;
+    color: #f5f8fa !important;
+    border-radius: 4px !important;
+    border: 1px solid rgba(212, 175, 55, 0.4) !important;
+    border-bottom: 3px solid #d4af37 !important;
+    padding: 6px 20px !important;
+    display: block !important;
+    width: 100% !important;
+    box-shadow: 0 4px 10px rgba(15, 43, 92, 0.1) !important;
+}
+body.theme-royal-sapphire .topic-title,
+body.theme-sapphire-compact-v2 .topic-title {
+    color: #0f2b5c !important;
+    background-color: rgba(92, 107, 115, 0.07) !important;
+    border-left: 5px solid #0f2b5c !important;
+    border-bottom: 1px dashed rgba(212, 175, 55, 0.5) !important;
+    padding: 4px 10px !important;
+    border-radius: 4px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-royal-sapphire .highlight-box,
+body.theme-sapphire-compact-v2 .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid #5c6b73 !important;
+    border-left: 5px solid #d4af37 !important;
+    border-radius: 4px !important;
+    color: #000000 !important;
+}
+
+/* 9. Imperial Jade Emperor - Jade Scroll Shields & Golden Seals */
+body.theme-jade-emperor .section-heading-bar,
+body.theme-jade-emperor .section-title,
+body.theme-jade-compact-v2 .section-heading-bar,
+body.theme-jade-compact-v2 .section-title {
+    background: #0c3d2e !important;
+    color: #faf8f0 !important;
+    border: 2px solid #d4af37 !important;
+    border-radius: 6px !important;
+    padding: 6px 22px !important;
+    display: block !important;
+    width: max-content !important;
+    margin: 8px auto !important;
+    box-shadow: 0 4px 10px rgba(12, 61, 46, 0.1) !important;
+    align-self: center !important;
+}
+body.theme-jade-emperor .topic-title,
+body.theme-jade-compact-v2 .topic-title {
+    color: #0c3d2e !important;
+    background-color: rgba(90, 143, 123, 0.08) !important;
+    border-bottom: 2px dashed #d4af37 !important;
+    border-left: 5px solid #0c3d2e !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-jade-emperor .highlight-box,
+body.theme-jade-compact-v2 .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(12, 61, 46, 0.2) !important;
+    border-left: 5px solid #d4af37 !important;
+    border-radius: 6px !important;
+    color: #000000 !important;
+}
+
+/* 10. Sun-Drenched Vintage Oasis - Clay Rounded Cards & Sand gold lines */
+body.theme-vintage-oasis .section-heading-bar,
+body.theme-vintage-oasis .section-title,
+body.theme-oasis-compact-v2 .section-heading-bar,
+body.theme-oasis-compact-v2 .section-title {
+    background: #8a4b2d !important;
+    color: #fefcf5 !important;
+    border-bottom: 4px solid #c9a25d !important;
+    border-radius: 16px 0px 16px 0px !important;
+    padding: 6px 20px !important;
+    display: block !important;
+    width: 100% !important;
+}
+body.theme-vintage-oasis .topic-title,
+body.theme-oasis-compact-v2 .topic-title {
+    color: #8a4b2d !important;
+    background-color: rgba(58, 95, 67, 0.06) !important;
+    border-left: 5px solid #3a5f43 !important;
+    border-bottom: 1px dashed rgba(201, 162, 93, 0.5) !important;
+    padding: 4px 10px !important;
+    border-radius: 4px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+body.theme-vintage-oasis .highlight-box,
+body.theme-oasis-compact-v2 .highlight-box {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(138, 75, 45, 0.2) !important;
+    border-left: 5px solid #c9a25d !important;
+    border-radius: 4px !important;
+    color: #000000 !important;
 }
 
 /* CYBERPUNK SYNTHWAVE THEME OVERRIDES */
@@ -4146,3 +5085,133 @@ body.light-mode .theme-pin-btn:hover {
 
 
 
+/* 11. Diamond Column Premium */
+body.theme-diamond-column, body.theme-diamond-column-compact {
+    --primary-color: #0f172a;
+    --secondary-color: #3b82f6;
+    --accent-color: #64748b;
+    --page-bg: #ffffff;
+}
+body.theme-diamond-column .bullet-item::before,
+body.theme-diamond-column-compact .bullet-item::before {
+    content: "??" !important;
+    font-size: 14px !important;
+    color: var(--secondary-color) !important;
+    top: 1px !important;
+    left: 0px !important;
+}
+body.theme-diamond-column .topic-title span.diamond,
+body.theme-diamond-column-compact .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-diamond-column .topic-title span.diamond::before,
+body.theme-diamond-column-compact .topic-title span.diamond::before {
+    content: "??" !important;
+    font-size: 15px !important;
+}
+body.theme-diamond-column .section-heading-bar,
+body.theme-diamond-column .section-title,
+body.theme-diamond-column-compact .section-heading-bar,
+body.theme-diamond-column-compact .section-title {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-left: 5px solid #3b82f6 !important;
+    border-radius: 4px 8px 8px 4px !important;
+    padding: 8px 20px !important;
+    display: inline-block !important;
+    width: max-content !important;
+    max-width: 100% !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+    align-self: flex-start !important;
+    margin-bottom: 15px !important;
+}
+body.theme-diamond-column .topic-title,
+body.theme-diamond-column-compact .topic-title {
+    color: #0f172a !important;
+    border-bottom: 2px solid #3b82f6 !important;
+    padding-bottom: 4px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+/* 12. RAAZ Ultimate Premium - Shape Shifting */
+body.theme-raaz, body.theme-raaz-compact {
+    --primary-color: #0a0a0a;
+    --secondary-color: #d4af37;
+    --accent-color: #800020;
+    --page-bg: #fdfbf7;
+    font-family: 'Martel', serif !important;
+}
+
+/* Bullet item overrides */
+body.theme-raaz .bullet-item::before,
+body.theme-raaz-compact .bullet-item::before {
+    content: "??" !important;
+    font-size: 14px !important;
+    color: var(--secondary-color) !important;
+    top: 1px !important;
+    left: 0px !important;
+    text-shadow: 0 0 5px rgba(212, 175, 55, 0.5) !important;
+}
+
+/* Topic diamond overrides */
+body.theme-raaz .topic-title span.diamond,
+body.theme-raaz-compact .topic-title span.diamond {
+    font-size: 0 !important;
+}
+body.theme-raaz .topic-title span.diamond::before,
+body.theme-raaz-compact .topic-title span.diamond::before {
+    content: "??" !important;
+    font-size: 16px !important;
+    filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.8)) !important;
+}
+
+/* Shape-shifting Animation */
+@keyframes raazShapeShift {
+    0% { border-radius: 8px 30px 8px 30px; box-shadow: 0 4px 15px rgba(128, 0, 32, 0.3); background-position: 0% 50%; }
+    50% { border-radius: 30px 8px 30px 8px; box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6); background-position: 100% 50%; }
+    100% { border-radius: 8px 30px 8px 30px; box-shadow: 0 4px 15px rgba(128, 0, 32, 0.3); background-position: 0% 50%; }
+}
+
+/* Ultra premium Section Heading */
+body.theme-raaz .section-heading-bar,
+body.theme-raaz .section-title,
+body.theme-raaz-compact .section-heading-bar,
+body.theme-raaz-compact .section-title {
+    background: linear-gradient(270deg, #0a0a0a, #1a1a1a, #800020, #0a0a0a) !important;
+    background-size: 300% 300% !important;
+    color: #d4af37 !important;
+    border: 2px solid #d4af37 !important;
+    padding: 10px 35px !important;
+    display: block !important;
+    width: max-content !important;
+    margin: 15px auto !important;
+    text-align: center !important;
+    font-family: 'Yatra One', cursive !important;
+    font-size: 26px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    animation: raazShapeShift 6s ease-in-out infinite !important;
+}
+
+/* Topic Title Override */
+body.theme-raaz .topic-title,
+body.theme-raaz-compact .topic-title {
+    color: #d4af37 !important;
+    background: #0a0a0a !important;
+    border: 1px solid #800020 !important;
+    border-left: 6px solid #d4af37 !important;
+    padding: 6px 15px !important;
+    border-radius: 4px 12px 12px 4px !important;
+    font-family: 'Yatra One', cursive !important;
+    font-size: 18px !important;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+/* Base Body Font Override */
+body.theme-raaz .page-content p.body-text,
+body.theme-raaz-compact .page-content p.body-text {
+    font-family: 'Martel', serif !important;
+    font-size: 14.5px !important;
+    line-height: 1.6 !important;
+}

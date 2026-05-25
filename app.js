@@ -124,6 +124,79 @@ document.addEventListener('DOMContentLoaded', () => {
     const globalLetterSpacingSelect = document.getElementById('global-letter-spacing');
     
     const toolbarButtons = document.querySelectorAll('.tool-btn');
+    const toolbarTrayTrigger = document.getElementById('toolbar-tray-trigger');
+    const toolbarTrayDrawer = document.getElementById('toolbar-tray-drawer');
+    const toolbarCustomizeTrigger = document.getElementById('toolbar-customize-trigger');
+
+    // Dynamic Toolbar Layout Configurations & Sanitization
+    const defaultToolbarLayout = {
+        main: ['btn-section', 'btn-topic', 'btn-bullet', 'btn-note', 'highlight-green-btn', 'highlight-pink-btn', 'box-style-select'],
+        tray: ['btn-pagebreak', 'btn-columnbreak', 'insert-image-btn', 'insert-table-btn', 'btn-search-toggle', 'btn-help-shortcuts']
+    };
+
+    let currentToolbarLayout = { ...defaultToolbarLayout };
+
+    function sanitizeToolbarLayout(saved) {
+        const allPossible = [...defaultToolbarLayout.main, ...defaultToolbarLayout.tray];
+        const sanitized = { main: [], tray: [] };
+        
+        if (saved && Array.isArray(saved.main) && Array.isArray(saved.tray)) {
+            saved.main.forEach(id => {
+                if (allPossible.includes(id) && !sanitized.main.includes(id)) sanitized.main.push(id);
+            });
+            saved.tray.forEach(id => {
+                if (allPossible.includes(id) && !sanitized.tray.includes(id)) sanitized.tray.push(id);
+            });
+        }
+        
+        allPossible.forEach(id => {
+            if (!sanitized.main.includes(id) && !sanitized.tray.includes(id)) {
+                if (defaultToolbarLayout.main.includes(id)) {
+                    sanitized.main.push(id);
+                } else {
+                    sanitized.tray.push(id);
+                }
+            }
+        });
+        
+        return sanitized;
+    }
+
+    const savedLayout = localStorage.getItem('samyak-toolbar-layout-v1');
+    if (savedLayout) {
+        try {
+            currentToolbarLayout = sanitizeToolbarLayout(JSON.parse(savedLayout));
+        } catch (e) {
+            console.error('Error loading toolbar layout:', e);
+        }
+    }
+
+    function renderToolbarLayout() {
+        const toolbar = document.querySelector('.editor-toolbar');
+        const trayDrawer = document.getElementById('toolbar-tray-drawer');
+        const trayTrigger = document.getElementById('toolbar-tray-trigger');
+        
+        if (!toolbar || !trayDrawer || !trayTrigger) return;
+        
+        // Append main toolbar elements in order before the tray trigger button
+        currentToolbarLayout.main.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                toolbar.insertBefore(btn, trayTrigger);
+            }
+        });
+        
+        // Append tray drawer elements in order inside the tray drawer
+        currentToolbarLayout.tray.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                trayDrawer.appendChild(btn);
+            }
+        });
+    }
+
+    // Run layout arrangement immediately on load
+    renderToolbarLayout();
 
     // Sidebar Horizontal Dynamic Navigation Tabs
     const sidebarTabButtons = document.querySelectorAll('.sidebar-tab-btn');
@@ -161,6 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const designTopicThick = document.getElementById('design-topic-thick');
     const designTopicThickVal = document.getElementById('design-topic-thick-val');
     const designTopicAlign = document.getElementById('design-topic-align');
+    const designSectionShape = document.getElementById('design-section-shape');
+    const designTopicIcon = document.getElementById('design-topic-icon');
+    const designBulletStyle = document.getElementById('design-bullet-style');
 
     const designInnerBorder = document.getElementById('design-inner-border');
     const designCornerColor = document.getElementById('design-corner-color');
@@ -201,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. WORKSPACE STATE
     let pagesData = [];      // Array of page objects: [ {type: 'cover', title: '...'}, {type: 'content', text: '...'} ]
     let activePageIndex = 0; // Current active page index
-    let zoomLevel = 100;      // Default scale is 100%
+    let zoomLevel = window.innerWidth <= 1024 ? 60 : 100;      // Default scale is 60% on mobile, 100% on desktop
     let contentFontSize = 13.5; // Default body text font size is 13.5px
     let MAX_CONTENT_HEIGHT = 910; // Measured dynamically inside renderPreview
     let cachedMaxContentHeight = null; // Cache to prevent layout thrashing
@@ -261,7 +337,10 @@ document.addEventListener('DOMContentLoaded', () => {
         endStarSymbol: '✦',
         endStarColor: '',
         endStarSize: '18',
-        endStarPulse: true
+        endStarPulse: true,
+        sectionShape: 'rectangle',
+        topicIcon: 'orange-diamond',
+        bulletStyle: 'classic'
     };
 
     // 2.1 Social Settings State
@@ -834,8 +913,8 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let fileIdx = 0; fileIdx < fileStates.length; fileIdx++) {
                 const fileBlocks = blocksFromFiles[fileIdx];
                 fileBlocks.forEach(b => {
-                    // Strip manual page breaks inside sections to let content flow naturally
-                    if (b.type !== 'pagebreak') {
+                    // Strip manual page breaks and column breaks inside sections to let content flow naturally
+                    if (b.type !== 'pagebreak' && b.type !== 'columnbreak') {
                         mergedMarkdownParts.push(b.markdown);
                     }
                 });
@@ -1524,9 +1603,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Toolbar Customize Edit Mode (Option B: Clicking swaps buttons)
+    let isCustomizeMode = false;
+
     // Markdown tool prefix insertion (and wrapping selection if data-suffix is present)
     toolbarButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            if (btn.id === 'toolbar-tray-trigger' || btn.id === 'toolbar-customize-trigger') return; // Skip trigger buttons
+            
+            if (isCustomizeMode) {
+                // Intercept click in customize mode to move the icon
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const btnId = btn.id;
+                const inMainIndex = currentToolbarLayout.main.indexOf(btnId);
+                const inTrayIndex = currentToolbarLayout.tray.indexOf(btnId);
+                
+                if (inMainIndex > -1) {
+                    // Move from main toolbar to tray drawer
+                    currentToolbarLayout.main.splice(inMainIndex, 1);
+                    currentToolbarLayout.tray.push(btnId);
+                } else if (inTrayIndex > -1) {
+                    // Move from tray drawer to main toolbar
+                    currentToolbarLayout.tray.splice(inTrayIndex, 1);
+                    currentToolbarLayout.main.push(btnId);
+                }
+                
+                localStorage.setItem('samyak-toolbar-layout-v1', JSON.stringify(currentToolbarLayout));
+                renderToolbarLayout();
+                
+                // Update title tooltip dynamically
+                const inMain = currentToolbarLayout.main.includes(btnId);
+                btn.setAttribute('title', inMain ? 'Move to Tray (ट्रे में डालें)' : 'Move to Toolbar (टूलबार में निकालें)');
+                return;
+            }
+
             if (activePageIndex > 0) {
                 const prefix = btn.getAttribute('data-prefix') || '';
                 const suffix = btn.getAttribute('data-suffix') || '';
@@ -1540,10 +1652,123 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    if (toolbarCustomizeTrigger) {
+        toolbarCustomizeTrigger.addEventListener('click', () => {
+            isCustomizeMode = !isCustomizeMode;
+            const toolbar = document.querySelector('.editor-toolbar');
+            
+            if (isCustomizeMode) {
+                toolbar.classList.add('customize-mode');
+                toolbarCustomizeTrigger.classList.add('active');
+                toolbarCustomizeTrigger.innerHTML = '✅';
+                toolbarCustomizeTrigger.setAttribute('title', 'Done Customizing (कस्टमाइज़ेशन पूरा हुआ)');
+                
+                // Keep tray open automatically so they can see items inside
+                if (toolbarTrayDrawer && !toolbarTrayDrawer.classList.contains('open')) {
+                    toolbarTrayDrawer.classList.add('open');
+                    toolbarTrayTrigger.classList.add('open');
+                }
+                
+                // Set hover tooltips to guide user
+                toolbarButtons.forEach(btn => {
+                    if (btn.id === 'toolbar-tray-trigger' || btn.id === 'toolbar-customize-trigger') return;
+                    const inMain = currentToolbarLayout.main.includes(btn.id);
+                    btn.setAttribute('data-orig-title', btn.getAttribute('title') || '');
+                    btn.setAttribute('title', inMain ? 'Move to Tray (ट्रे में डालें)' : 'Move to Toolbar (टूलबार में निकालें)');
+                });
+                
+                if (boxStyleSelect) {
+                    boxStyleSelect.setAttribute('data-orig-title', boxStyleSelect.getAttribute('title') || '');
+                    const inMain = currentToolbarLayout.main.includes('box-style-select');
+                    boxStyleSelect.setAttribute('title', inMain ? 'Move to Tray (ट्रे में डालें)' : 'Move to Toolbar (टूलबार में निकालें)');
+                }
+            } else {
+                toolbar.classList.remove('customize-mode');
+                toolbarCustomizeTrigger.classList.remove('active');
+                toolbarCustomizeTrigger.innerHTML = '⚙️';
+                toolbarCustomizeTrigger.setAttribute('title', 'Customize Toolbar (टूलबार कस्टमाइज़ करें)');
+                
+                // Restore original tray state
+                const savedTrayState = localStorage.getItem('samyak-toolbar-tray-open');
+                if (savedTrayState !== 'true' && toolbarTrayDrawer) {
+                    toolbarTrayDrawer.classList.remove('open');
+                    toolbarTrayTrigger.classList.remove('open');
+                }
+                
+                // Restore original tooltips
+                toolbarButtons.forEach(btn => {
+                    if (btn.id === 'toolbar-tray-trigger' || btn.id === 'toolbar-customize-trigger') return;
+                    const orig = btn.getAttribute('data-orig-title');
+                    if (orig !== null && orig !== undefined) btn.setAttribute('title', orig);
+                });
+                
+                if (boxStyleSelect) {
+                    const orig = boxStyleSelect.getAttribute('data-orig-title');
+                    if (orig !== null && orig !== undefined) boxStyleSelect.setAttribute('title', orig);
+                }
+            }
+        });
+    }
+
+    // Toolbar collapsible drawer (System Tray) logic
+    if (toolbarTrayTrigger && toolbarTrayDrawer) {
+        // Retrieve last tray state from localStorage so it persists across refreshes
+        const savedTrayState = localStorage.getItem('samyak-toolbar-tray-open');
+        if (savedTrayState === 'true') {
+            toolbarTrayDrawer.classList.add('open');
+            toolbarTrayTrigger.classList.add('open');
+            toolbarTrayTrigger.setAttribute('title', 'Hide Advanced Tools (एडवांस्ड टूल्स छुपाएं)');
+        }
+
+        toolbarTrayTrigger.addEventListener('click', () => {
+            const isOpen = toolbarTrayDrawer.classList.toggle('open');
+            toolbarTrayTrigger.classList.toggle('open', isOpen);
+            
+            if (isOpen) {
+                toolbarTrayTrigger.setAttribute('title', 'Hide Advanced Tools (एडवांस्ड टूल्स छुपाएं)');
+                localStorage.setItem('samyak-toolbar-tray-open', 'true');
+            } else {
+                toolbarTrayTrigger.setAttribute('title', 'Show Advanced Tools (एडवांस्ड टूल्स दिखाएं)');
+                localStorage.setItem('samyak-toolbar-tray-open', 'false');
+            }
+        });
+    }
+
     // Box style select dropdown handler
     const boxStyleSelect = document.getElementById('box-style-select');
     if (boxStyleSelect) {
+        // Prevent opening dropdown and move it in customize mode
+        boxStyleSelect.addEventListener('mousedown', (e) => {
+            if (isCustomizeMode) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const btnId = 'box-style-select';
+                const inMainIndex = currentToolbarLayout.main.indexOf(btnId);
+                const inTrayIndex = currentToolbarLayout.tray.indexOf(btnId);
+                
+                if (inMainIndex > -1) {
+                    currentToolbarLayout.main.splice(inMainIndex, 1);
+                    currentToolbarLayout.tray.push(btnId);
+                } else if (inTrayIndex > -1) {
+                    currentToolbarLayout.tray.splice(inTrayIndex, 1);
+                    currentToolbarLayout.main.push(btnId);
+                }
+                
+                localStorage.setItem('samyak-toolbar-layout-v1', JSON.stringify(currentToolbarLayout));
+                renderToolbarLayout();
+                
+                // Update title tooltip dynamically
+                const inMain = currentToolbarLayout.main.includes(btnId);
+                boxStyleSelect.setAttribute('title', inMain ? 'Move to Tray (ट्रे में डालें)' : 'Move to Toolbar (टूलबार में निकालें)');
+            }
+        });
+
         boxStyleSelect.addEventListener('change', () => {
+            if (isCustomizeMode) {
+                boxStyleSelect.value = "";
+                return;
+            }
             const selectedStyle = boxStyleSelect.value;
             if (selectedStyle && activePageIndex > 0) {
                 const prefix = `[${selectedStyle}]\n`;
@@ -1667,6 +1892,28 @@ document.addEventListener('DOMContentLoaded', () => {
         applyCustomDesignSettingsToDOM();
         saveWorkspaceToLocalStorage();
     });
+
+    if (designSectionShape) {
+        designSectionShape.addEventListener('change', (e) => {
+            customDesignSettings.sectionShape = e.target.value;
+            renderPreview();
+            saveWorkspaceToLocalStorage();
+        });
+    }
+    if (designTopicIcon) {
+        designTopicIcon.addEventListener('change', (e) => {
+            customDesignSettings.topicIcon = e.target.value;
+            renderPreview();
+            saveWorkspaceToLocalStorage();
+        });
+    }
+    if (designBulletStyle) {
+        designBulletStyle.addEventListener('change', (e) => {
+            customDesignSettings.bulletStyle = e.target.value;
+            renderPreview();
+            saveWorkspaceToLocalStorage();
+        });
+    }
 
     // Group 2: Topic Heading
     designTopicText.addEventListener('input', (e) => {
@@ -2231,6 +2478,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 continue;
             }
 
+            // 0.55 COLUMN BREAK DETECTOR
+            if (trimmed === '[columnbreak]' || trimmed === '[colbreak]') {
+                blocks.push({
+                    type: 'columnbreak',
+                    markdown: line
+                });
+                continue;
+            }
+
             // 0.6 THANK YOU BOX DETECTOR / STAR DIVIDER
             if (trimmed === '[thankyou]' || trimmed === '***' || trimmed === '* * *' || trimmed === '✦ ✦ ✦') {
                 blocks.push({
@@ -2492,6 +2748,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const sectionTitle = line.replace(/^#+\s*/, '').replace(/^[?？\s]+/, '').trim();
             const sectionEl = document.createElement('h1');
             sectionEl.className = 'section-heading-bar';
+            sectionEl.setAttribute('data-shape', customDesignSettings.sectionShape || 'rectangle');
             sectionEl.textContent = sectionTitle;
             return sectionEl;
         } 
@@ -2514,6 +2771,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             topicTitle = topicTitle.replace(/^[🔶🔷🔸🔹♦️💎]\s*/, '').trim();
+
+            // Apply global topic icon style if it's the default orange diamond
+            if (icon === '🔶') {
+                const globalIconStyle = customDesignSettings.topicIcon || 'orange-diamond';
+                if (globalIconStyle === 'blue-diamond') icon = '🔷';
+                else if (globalIconStyle === 'star') icon = '⭐';
+                else if (globalIconStyle === 'pushpin') icon = '📌';
+                else if (globalIconStyle === 'rocket') icon = '🚀';
+                else if (globalIconStyle === 'nib') icon = '✒️';
+                else if (globalIconStyle === 'pencil') icon = '📝';
+                // Premium Magazine Icons
+                else if (globalIconStyle === 'crown') icon = '👑';
+                else if (globalIconStyle === 'fleur-de-lis') icon = '⚜️';
+                else if (globalIconStyle === 'sparkles') icon = '✨';
+                else if (globalIconStyle === 'book') icon = '📖';
+                else if (globalIconStyle === 'jewel') icon = '💎';
+                else if (globalIconStyle === 'quill') icon = '🪶';
+                else if (globalIconStyle === 'trophy') icon = '🏆';
+                // Hand Icons
+                else if (globalIconStyle === 'hand-right') icon = '👉';
+                else if (globalIconStyle === 'hand-writing') icon = '✍️';
+                else if (globalIconStyle === 'hand-thumb') icon = '👍';
+                else if (globalIconStyle === 'hand-up') icon = '👆';
+                else if (globalIconStyle === 'none') icon = '';
+            }
 
             const topicContainer = document.createElement('div');
             topicContainer.className = 'topic-container';
@@ -2689,6 +2971,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return createEndDividerElement();
         }
         
+        // 4.97 COLUMN BREAK RENDER
+        else if (block.type === 'columnbreak') {
+            const div = document.createElement('div');
+            div.className = 'column-break';
+            return div;
+        }
+        
         // 5. REGULAR BODY PARAGRAPH RENDER
         else {
             const p = document.createElement('p');
@@ -2855,6 +3144,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             case 'thankyou':
                 return 60;
+            case 'columnbreak':
+                return 0;
             case 'image':
                 return 220; // conservative estimate for image height
             case 'table':
@@ -2963,7 +3254,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Track estimated height of content on the current page to reduce DOM layout reads
         let currentPageHeight = 0;
-        const checkThreshold = MAX_CONTENT_HEIGHT - 120;
+        const checkThreshold = MAX_CONTENT_HEIGHT - 35; // Dynamically check scrollHeight only near the very limit (1-2 lines away) to prevent massive layout thrashing
 
         for (let i = 0; i < blocks.length; i++) {
             const block = blocks[i];
@@ -2991,6 +3282,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!activeBulletListElement) {
                     activeBulletListElement = document.createElement('div');
                     activeBulletListElement.className = 'bullet-list';
+                    activeBulletListElement.setAttribute('data-bullet-style', customDesignSettings.bulletStyle || 'classic');
                     currentPageStruct.contentElement.appendChild(activeBulletListElement);
                 }
                 activeBulletListElement.appendChild(node);
@@ -3189,6 +3481,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (block.type === 'bullet') {
                             activeBulletListElement = document.createElement('div');
                             activeBulletListElement.className = 'bullet-list';
+                            activeBulletListElement.setAttribute('data-bullet-style', customDesignSettings.bulletStyle || 'classic');
                             currentPageStruct.contentElement.appendChild(activeBulletListElement);
                             activeBulletListElement.appendChild(node);
                         } else {
@@ -3882,6 +4175,16 @@ document.addEventListener('DOMContentLoaded', () => {
         designPageNumSize.value = customDesignSettings.pageNumSize || '15';
         designPageNumSizeVal.textContent = `${customDesignSettings.pageNumSize || 15}px`;
 
+        if (designSectionShape) {
+            designSectionShape.value = customDesignSettings.sectionShape || 'rectangle';
+        }
+        if (designTopicIcon) {
+            designTopicIcon.value = customDesignSettings.topicIcon || 'orange-diamond';
+        }
+        if (designBulletStyle) {
+            designBulletStyle.value = customDesignSettings.bulletStyle || 'classic';
+        }
+
         if (customDesignSettings.headerLogoSrc) {
             headerLogoPreview.src = customDesignSettings.headerLogoSrc;
             headerLogoPreviewGroup.style.display = 'block';
@@ -3926,6 +4229,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     if (customDesignSettings.endStarPulse === undefined) {
                         customDesignSettings.endStarPulse = true;
+                    }
+                    if (customDesignSettings.sectionShape === undefined) {
+                        customDesignSettings.sectionShape = 'rectangle';
+                    }
+                    if (customDesignSettings.topicIcon === undefined) {
+                        customDesignSettings.topicIcon = 'orange-diamond';
+                    }
+                    if (customDesignSettings.bulletStyle === undefined) {
+                        customDesignSettings.bulletStyle = 'classic';
                     }
                     socialSettings = state.socialSettings || { telegramText: '@samyak', youtubeText: 'Samyak Coaching' };
                     if (socialSettings.fontSize === undefined) socialSettings.fontSize = 11;
@@ -4271,6 +4583,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (designSectionAlign) {
             designSectionAlign.value = 'left';
         }
+        customDesignSettings.sectionShape = 'rectangle';
+        if (designSectionShape) {
+            designSectionShape.value = 'rectangle';
+        }
 
         designTopicSize.value = '15';
         designTopicSizeVal.textContent = '15px';
@@ -4288,6 +4604,14 @@ document.addEventListener('DOMContentLoaded', () => {
         designTopicAlign.value = 'flex-start';
         document.documentElement.style.setProperty('--custom-topic-alignment', 'flex-start');
         customDesignSettings.topicAlignment = 'flex-start';
+        customDesignSettings.topicIcon = 'orange-diamond';
+        if (designTopicIcon) {
+            designTopicIcon.value = 'orange-diamond';
+        }
+        customDesignSettings.bulletStyle = 'classic';
+        if (designBulletStyle) {
+            designBulletStyle.value = 'classic';
+        }
 
         designBorderThick.value = '0';
         designBorderThickVal.textContent = '0px';
@@ -4819,14 +5143,45 @@ document.addEventListener('DOMContentLoaded', () => {
             { value: 'gothic-velvet', name: '🏰 Morphing Gothic Velvet', category: 'morphing', colors: ['#2e1065', '#b45309', '#db2777'] },
             { value: 'velvet-compact', name: '🏰 Gothic Velvet - Compact', category: 'morphing', colors: ['#2e1065', '#b45309', '#db2777'] },
             { value: 'kyoto-zen', name: '⛩️ Morphing Kyoto Zen', category: 'morphing', colors: ['#991b1b', '#fbcfe8', '#4b5563'] },
-            { value: 'zen-compact', name: '⛩️ Kyoto Zen - Compact', category: 'morphing', colors: ['#991b1b', '#fbcfe8', '#4b5563'] }
+            { value: 'zen-compact', name: '⛩️ Kyoto Zen - Compact', category: 'morphing', colors: ['#991b1b', '#fbcfe8', '#4b5563'] },
+
+            // 10 Brand New Ultra-Premium Shape-Shifting Themes
+            { value: 'gothic-royal', name: '🏰 Gothic Royal Black', category: 'ultra-premium', colors: ['#4a0e17', '#b8860b', '#1a1a1a'] },
+            { value: 'royal-compact-v2', name: '🏰 Gothic Royal Black - Compact', category: 'ultra-premium', colors: ['#4a0e17', '#b8860b', '#1a1a1a'] },
+            { value: 'kyoto-ink', name: '⛩️ Zen Kyoto & Ink', category: 'ultra-premium', colors: ['#111111', '#b22222', '#cda557'] },
+            { value: 'kyoto-compact-ink', name: '⛩️ Zen Kyoto & Ink - Compact', category: 'ultra-premium', colors: ['#111111', '#b22222', '#cda557'] },
+            { value: 'athenian-gold', name: '🏛️ Athenian Temple Gold', category: 'ultra-premium', colors: ['#0b2240', '#c5a059', '#4a5d3e'] },
+            { value: 'athenian-compact-v2', name: '🏛️ Athenian Temple Gold - Compact', category: 'ultra-premium', colors: ['#0b2240', '#c5a059', '#4a5d3e'] },
+            { value: 'autumn-vintage', name: '🍁 Warm Autumn Vintage', category: 'ultra-premium', colors: ['#5c2e16', '#d48227', '#1a4329'] },
+            { value: 'autumn-compact-v2', name: '🍁 Warm Autumn Vintage - Compact', category: 'ultra-premium', colors: ['#5c2e16', '#d48227', '#1a4329'] },
+            { value: 'maharaja-gold', name: '👑 Maharaja Palace Gold', category: 'ultra-premium', colors: ['#800020', '#e6a100', '#008080'] },
+            { value: 'maharaja-compact-v2', name: '👑 Maharaja Palace Gold - Compact', category: 'ultra-premium', colors: ['#800020', '#e6a100', '#008080'] },
+            { value: 'victorian-prestige', name: '⚜️ Baroque Victorian Prestige', category: 'ultra-premium', colors: ['#004743', '#a3761a', '#8b1e3f'] },
+            { value: 'victorian-compact-v2', name: '⚜️ Baroque Victorian Prestige - Compact', category: 'ultra-premium', colors: ['#004743', '#a3761a', '#8b1e3f'] },
+            { value: 'neo-gothic', name: '⚡ Neo-Gothic Obsidian', category: 'ultra-premium', colors: ['#1a1a1a', '#e8a838', '#ab4b3c'] },
+            { value: 'neo-gothic-compact', name: '⚡ Neo-Gothic Obsidian - Compact', category: 'ultra-premium', colors: ['#1a1a1a', '#e8a838', '#ab4b3c'] },
+            { value: 'royal-sapphire', name: '💎 Royal Sapphire Luxury', category: 'ultra-premium', colors: ['#0f2b5c', '#d4af37', '#5c6b73'] },
+            { value: 'sapphire-compact-v2', name: '💎 Royal Sapphire Luxury - Compact', category: 'ultra-premium', colors: ['#0f2b5c', '#d4af37', '#5c6b73'] },
+            { value: 'jade-emperor', name: '🐉 Imperial Jade Emperor', category: 'ultra-premium', colors: ['#0c3d2e', '#d4af37', '#5a8f7b'] },
+            { value: 'jade-compact-v2', name: '🐉 Imperial Jade Emperor - Compact', category: 'ultra-premium', colors: ['#0c3d2e', '#d4af37', '#5a8f7b'] },
+            { value: 'vintage-oasis', name: '🌴 Sun-Drenched Vintage Oasis', category: 'ultra-premium', colors: ['#8a4b2d', '#c9a25d', '#3a5f43'] },
+            { value: 'oasis-compact-v2', name: '🌴 Sun-Drenched Vintage Oasis - Compact', category: 'ultra-premium', colors: ['#8a4b2d', '#c9a25d', '#3a5f43'] },
+            { value: 'diamond-column', name: '💎 Diamond Column Premium', category: 'ultra-premium', colors: ['#0f172a', '#3b82f6', '#64748b'] },
+            { value: 'diamond-column-compact', name: '💎 Diamond Column Premium - Compact', category: 'ultra-premium', colors: ['#0f172a', '#3b82f6', '#64748b'] },
+            { value: 'theme-raaz', name: '🔥 RAAZ Ultimate Premium', category: 'ultra-premium', colors: ['#0a0a0a', '#d4af37', '#800020'] },
+            { value: 'theme-raaz-compact', name: '🔥 RAAZ Ultimate Premium - Compact', category: 'ultra-premium', colors: ['#0a0a0a', '#d4af37', '#800020'] }
         ];
 
         // Load pinned themes from localStorage
         let pinnedList = JSON.parse(localStorage.getItem('samyak-pinned-themes') || '["maroon-gold", "maroon-compact", "minimal-compact", "royal-durbar"]');
+        let deletedThemeList = JSON.parse(localStorage.getItem('samyak-deleted-themes') || '[]');
 
         function savePinnedThemes() {
             localStorage.setItem('samyak-pinned-themes', JSON.stringify(pinnedList));
+        }
+
+        function saveDeletedThemes() {
+            localStorage.setItem('samyak-deleted-themes', JSON.stringify(deletedThemeList));
         }
 
         // Render the dropdown panel list dynamically
@@ -4834,8 +5189,11 @@ document.addEventListener('DOMContentLoaded', () => {
             listContainer.innerHTML = '';
             const query = searchQuery.trim().toLowerCase();
 
+            // Filter out deleted themes
+            const visibleThemes = themes.filter(t => !deletedThemeList.includes(t.value));
+
             // 1. Group pinned themes together at the very top!
-            const pinnedObjects = themes.filter(t => pinnedList.includes(t.value));
+            const pinnedObjects = visibleThemes.filter(t => pinnedList.includes(t.value));
             const filteredPinned = pinnedObjects.filter(t => t.name.toLowerCase().includes(query));
 
             if (filteredPinned.length > 0) {
@@ -4845,13 +5203,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 2. Classify other themes by categories
             const categories = [
+                { id: 'ultra-premium', name: '👑 Ultra-Premium Shape-Shifting' },
                 { id: 'morphing', name: '🎭 Shape-Morphing Themes' },
                 { id: 'print', name: '🖨️ Print-Friendly Themes' },
                 { id: 'classic', name: '✨ Classic Themes' }
             ];
 
             categories.forEach(cat => {
-                const catThemes = themes.filter(t => t.category === cat.id && !pinnedList.includes(t.value));
+                const catThemes = visibleThemes.filter(t => t.category === cat.id && !pinnedList.includes(t.value));
                 const filteredCatThemes = catThemes.filter(t => t.name.toLowerCase().includes(query));
 
                 if (filteredCatThemes.length > 0) {
@@ -4919,6 +5278,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     togglePinTheme(theme.value);
                 });
                 item.appendChild(pinBtn);
+
+                // Delete button
+                const delBtn = document.createElement('button');
+                delBtn.className = 'theme-del-btn';
+                delBtn.textContent = '🗑️';
+                delBtn.title = 'Delete this theme';
+                delBtn.style.background = 'none';
+                delBtn.style.border = 'none';
+                delBtn.style.cursor = 'pointer';
+                delBtn.style.fontSize = '12px';
+                delBtn.style.opacity = '0.4';
+                delBtn.style.marginLeft = '4px';
+                delBtn.style.transition = 'opacity 0.2s';
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm(`Kya aap sach me theme "${theme.name}" ko hide karna chahte hain?`)) {
+                        deletedThemeList.push(theme.value);
+                        saveDeletedThemes();
+                        renderDropdownList(searchInput.value);
+                    }
+                });
+                delBtn.addEventListener('mouseenter', () => delBtn.style.opacity = '1');
+                delBtn.addEventListener('mouseleave', () => delBtn.style.opacity = '0.4');
+                item.appendChild(delBtn);
 
                 // Select Theme Action on click
                 item.addEventListener('click', () => {

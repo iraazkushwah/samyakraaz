@@ -70,6 +70,31 @@
                             <option value="velvet-compact">🏰 Gothic Velvet - Compact</option>
                             <option value="kyoto-zen">⛩️ Morphing Kyoto Zen</option>
                             <option value="zen-compact">⛩️ Kyoto Zen - Compact</option>
+                            <!-- 10 Brand New Ultra-Premium Shape-Shifting Themes -->
+                            <option value="gothic-royal">🏰 Gothic Royal Black</option>
+                            <option value="royal-compact-v2">🏰 Gothic Royal Black - Compact</option>
+                            <option value="kyoto-ink">⛩️ Zen Kyoto & Ink</option>
+                            <option value="kyoto-compact-ink">⛩️ Zen Kyoto & Ink - Compact</option>
+                            <option value="athenian-gold">🏛️ Athenian Temple Gold</option>
+                            <option value="athenian-compact-v2">🏛️ Athenian Temple Gold - Compact</option>
+                            <option value="autumn-vintage">🍁 Warm Autumn Vintage</option>
+                            <option value="autumn-compact-v2">🍁 Warm Autumn Vintage - Compact</option>
+                            <option value="maharaja-gold">👑 Maharaja Palace Gold</option>
+                            <option value="maharaja-compact-v2">👑 Maharaja Palace Gold - Compact</option>
+                            <option value="victorian-prestige">⚜️ Baroque Victorian Prestige</option>
+                            <option value="victorian-compact-v2">⚜️ Baroque Victorian Prestige - Compact</option>
+                            <option value="neo-gothic">⚡ Neo-Gothic Obsidian</option>
+                            <option value="neo-gothic-compact">⚡ Neo-Gothic Obsidian - Compact</option>
+                            <option value="royal-sapphire">💎 Royal Sapphire Luxury</option>
+                            <option value="sapphire-compact-v2">💎 Royal Sapphire Luxury - Compact</option>
+                            <option value="jade-emperor">🐉 Imperial Jade Emperor</option>
+                            <option value="jade-compact-v2">🐉 Imperial Jade Emperor - Compact</option>
+                            <option value="vintage-oasis">🌴 Sun-Drenched Vintage Oasis</option>
+                            <option value="oasis-compact-v2">🌴 Sun-Drenched Vintage Oasis - Compact</option>
+                            <option value="diamond-column">💎 Diamond Column Premium</option>
+                            <option value="diamond-column-compact">💎 Diamond Column Premium - Compact</option>
+                            <option value="theme-raaz">🔥 RAAZ Ultimate Premium (Shape-Shifting)</option>
+                            <option value="theme-raaz-compact">🔥 RAAZ Ultimate Premium - Compact</option>
                         </select>
                     </div>
                     <button id="theme-toggle-btn" class="header-action-btn" title="Toggle Editor Theme">🌙</button>
@@ -204,11 +229,17 @@
                                     <option value="box-royal">👑 Royal Box</option>
                                 </select>
 
-                                <button class="tool-btn" id="btn-pagebreak" data-prefix="&#10;[pagebreak]&#10;" title="Insert Page Break">📄</button>
-                                <button class="tool-btn" id="insert-image-btn" title="Insert Photo/Image">📷</button>
-                                <button class="tool-btn" id="insert-table-btn" title="Insert Table">📊</button>
-                                <button class="tool-btn" id="btn-search-toggle" title="Find and Replace">🔍</button>
-                                <button class="tool-btn" id="btn-help-shortcuts" title="Shortcuts & Formatting Help">❓</button>
+                                <button class="tool-btn" id="toolbar-customize-trigger" title="Customize Toolbar (टूलबार कस्टमाइज़ करें)">⚙️</button>
+                                <button class="tool-btn tray-trigger-btn" id="toolbar-tray-trigger" title="Show Advanced Tools (एडवांस्ड टूल्स दिखाएं)">▶</button>
+
+                                <div class="toolbar-tray-drawer" id="toolbar-tray-drawer">
+                                    <button class="tool-btn" id="btn-pagebreak" data-prefix="&#10;[pagebreak]&#10;" title="Insert Page Break">📄</button>
+                                    <button class="tool-btn" id="btn-columnbreak" data-prefix="&#10;[columnbreak]&#10;" title="Insert Column Break">📑</button>
+                                    <button class="tool-btn" id="insert-image-btn" title="Insert Photo/Image">📷</button>
+                                    <button class="tool-btn" id="insert-table-btn" title="Insert Table">📊</button>
+                                    <button class="tool-btn" id="btn-search-toggle" title="Find and Replace">🔍</button>
+                                    <button class="tool-btn" id="btn-help-shortcuts" title="Shortcuts & Formatting Help">❓</button>
+                                </div>
                                 <input type="file" id="editor-image-upload" accept="image/*" style="display: none;">
                             </div>
                             <div id="search-replace-panel" class="search-replace-panel" style="display: none;">
@@ -436,6 +467,16 @@
                                         <option value="center">Center Align</option>
                                     </select>
                                 </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">📐</span> Heading Shape (शेप):</label>
+                                    <select id="design-section-shape" class="opt-select">
+                                        <option value="rectangle" selected>Flat Rectangle</option>
+                                        <option value="rounded">Soft Rounded</option>
+                                        <option value="pill">Pill / Stadium</option>
+                                        <option value="left-stripe">Left Accent Stripe</option>
+                                        <option value="underline">Elegant Underline</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -483,6 +524,49 @@
                                         <option value="flex-start" selected>Left Align</option>
                                         <option value="center">Center Align</option>
                                         <option value="flex-end">Right Align</option>
+                                    </select>
+                                </div>
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">🔸</span> Topic Icon Style (आइकॉन):</label>
+                                    <select id="design-topic-icon" class="opt-select">
+                                        <option value="orange-diamond" selected>Orange Diamond 🔶</option>
+                                        <option value="blue-diamond">Blue Diamond 🔷</option>
+                                        <option value="star">Golden Star ⭐</option>
+                                        <option value="pushpin">Pushpin 📌</option>
+                                        <option value="rocket">Rocket 🚀</option>
+                                        <option value="nib">Nib ✒️</option>
+                                        <option value="pencil">Pencil 📝</option>
+                                        <!-- Premium Magazine Icons -->
+                                        <option value="crown">Royal Crown 👑</option>
+                                        <option value="fleur-de-lis">Premium Crest ⚜️</option>
+                                        <option value="sparkles">Sparkles ✨</option>
+                                        <option value="book">Open Book 📖</option>
+                                        <option value="jewel">Diamond Jewel 💎</option>
+                                        <option value="quill">Quill / Feather 🪶</option>
+                                        <option value="trophy">Trophy 🏆</option>
+                                        <!-- Hand Icons -->
+                                        <option value="hand-right">Hand Pointing Right 👉</option>
+                                        <option value="hand-writing">Writing Hand ✍️</option>
+                                        <option value="hand-thumb">Thumbs Up 👍</option>
+                                        <option value="hand-up">Hand Pointing Up 👆</option>
+                                        <option value="none">None (No Icon)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 2.5: Bullet Points Customizer -->
+                        <div class="global-page-options" style="margin-top: 15px;">
+                            <h4 class="options-group-title">🟢 Bullet Points (बुलेट सूची)</h4>
+                            <div class="options-grid">
+                                <div class="option-item full-width-opt">
+                                    <label><span class="opt-icon">🟢</span> Bullet Style (बुलेट स्टाइल):</label>
+                                    <select id="design-bullet-style" class="opt-select">
+                                        <option value="classic" selected>Classic Dot (•)</option>
+                                        <option value="diamond">Diamond (◆)</option>
+                                        <option value="square">Square (■)</option>
+                                        <option value="arrow">Arrow (➜)</option>
+                                        <option value="checkmark">Checkmark (✔)</option>
                                     </select>
                                 </div>
                             </div>
@@ -615,20 +699,21 @@
                 </div>
             </div>
 
-            <!-- Floating Editor Actions Menu (Replaces editor-footer) -->
-            <div class="floating-editor-controls">
-                <div class="fab-container" id="editor-fab-container">
-                    <!-- Speed Dial Sub-buttons -->
-                    <div class="fab-menu-items">
-                        <button id="smart-shrink-btn" class="fab-sub-btn btn-secondary" title="Smart Shrink: Auto-shrink spacing/size slightly to fit overflow content onto previous pages">🪄</button>
-                        <button id="clear-all-btn" class="fab-sub-btn btn-clear" title="Clear Content: Clear all content and start fresh">🗑️</button>
-                        <button id="print-pdf-btn" class="fab-sub-btn btn-primary" title="Save as PDF">🖨️</button>
-                    </div>
-                    <!-- Main FAB Trigger -->
-                    <button class="fab-trigger-btn" id="editor-fab-trigger" title="Quick Actions (त्वरित विकल्प)">⚡</button>
-                </div>
-            </div>
         </aside>
+
+        <!-- Floating Editor Actions Menu (Moved outside aside to stay visible when sidebar is collapsed) -->
+        <div class="floating-editor-controls">
+            <div class="fab-container" id="editor-fab-container">
+                <!-- Speed Dial Sub-buttons -->
+                <div class="fab-menu-items">
+                    <button id="print-pdf-btn" class="fab-sub-btn btn-primary" title="Save as PDF">🖨️</button>
+                    <button id="smart-shrink-btn" class="fab-sub-btn btn-secondary" title="Smart Shrink: Auto-shrink spacing/size slightly to fit overflow content onto previous pages">🪄</button>
+                    <button id="clear-all-btn" class="fab-sub-btn btn-clear" title="Clear Content: Clear all content and start fresh">🗑️</button>
+                </div>
+                <!-- Main FAB Trigger -->
+                <button class="fab-trigger-btn" id="editor-fab-trigger" title="Quick Actions (त्वरित विकल्प)">⚡</button>
+            </div>
+        </div>
 
         <!-- Resize Handle Divider -->
         <div class="resize-handle" id="sidebar-resize-handle" title="Drag to resize editor panel">
@@ -861,6 +946,7 @@
                     </h4>
                     <table style="width: 100%; border-collapse: collapse; text-align: left;">
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; width: 40%; font-family: monospace;">[pagebreak] या ---</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Force break to a new page (नया पेज ब्रेक)</td></tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">[columnbreak] या [colbreak]</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Force break to a new column (मैनुअल कॉलम ब्रेक)</td></tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">[space N] या space N</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Insert blank lines (e.g. <code>[space 3]</code>)</td></tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);"><td style="padding: 6px 0; font-weight: bold; font-family: monospace;">***, * * *, [thankyou]</td><td style="padding: 6px 0; color: var(--ui-text-muted);">Premium magazine end star divider (विभाजक)</td></tr>
                     </table>
