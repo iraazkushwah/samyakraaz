@@ -232,7 +232,6 @@
                                     <option value="box-royal">👑 Royal Box</option>
                                 </select>
 
-                                <button class="tool-btn" id="sync-preview-btn" title="Preview Refresh — Double Ctrl" style="color: #818cf8;">🔄</button>
                                 <button class="tool-btn" id="toolbar-customize-trigger" title="Customize Toolbar (टूलबार कस्टमाइज़ करें)">⚙️</button>
                                 <button class="tool-btn tray-trigger-btn" id="toolbar-tray-trigger" title="Show Advanced Tools (एडवांस्ड टूल्स दिखाएं)">▶</button>
 
@@ -731,12 +730,17 @@
         <!-- Right Panel: Live A4 Preview Canvas -->
         <main class="preview-panel">
             <div class="preview-header">
-                <h2>Live A4 Print Preview</h2>
+                <h2>Preview</h2>
+                <div class="header-stats" title="Page / Words">
+                    <span id="active-page-label">Cover</span>, <span id="word-count">0</span>
+                </div>
                 <div class="preview-zoom-controls">
                     <button id="zoom-out" class="zoom-btn" title="Zoom Out">-</button>
                     <span id="zoom-level">100%</span>
                     <button id="zoom-in" class="zoom-btn" title="Zoom In">+</button>
                 </div>
+                <!-- Close Button for Mobile Drawer View -->
+                <button id="mobile-preview-close-btn" class="mobile-preview-close-btn" title="Preview बंद करें">&times;</button>
             </div>
             
             <div class="canvas-wrapper">
@@ -746,11 +750,6 @@
                 </div>
             </div>
 
-            <!-- Floating Stats (Shifted from Editor Panel) -->
-            <div class="floating-stats">
-                <span id="active-page-label">Editing: Cover Page</span>
-                <span id="word-count">Words: 0</span>
-            </div>
         </main>
     </div>
 
@@ -1039,6 +1038,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Mobile-only Floating Preview Toggle Button -->
+    <button id="mobile-preview-toggle-btn" class="mobile-preview-toggle-btn" title="Live Preview देखें">👁️</button>
 
     <!-- Script loading -->
     <script src="app.js"></script>

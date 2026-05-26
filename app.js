@@ -115,6 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomLevelSpan = document.getElementById('zoom-level');
     
+    // Mobile preview drawer elements
+    const mobilePreviewToggleBtn = document.getElementById('mobile-preview-toggle-btn');
+    const mobilePreviewCloseBtn = document.getElementById('mobile-preview-close-btn');
+    const previewPanel = document.querySelector('.preview-panel');
+    
     const fontDecreaseBtn = document.getElementById('font-decrease');
     const fontIncreaseBtn = document.getElementById('font-increase');
     const fontSizeValSpan = document.getElementById('font-size-val');
@@ -278,7 +283,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let pagesData = [];      // Array of page objects: [ {type: 'cover', title: '...'}, {type: 'content', text: '...'} ]
     let currentRenderedBlocks = []; // Array of currently rendered content blocks for scroll sync
     let activePageIndex = 0; // Current active page index
-    let zoomLevel = window.innerWidth <= 1024 ? 60 : 100;      // Default scale is 60% on mobile, 100% on desktop
+    let zoomLevel = 100;
+    if (window.innerWidth <= 768) {
+        let optimalZoom = Math.floor((window.innerWidth - 32) / 794 * 100);
+        zoomLevel = Math.max(35, Math.min(optimalZoom, 60));
+    } else if (window.innerWidth <= 1024) {
+        zoomLevel = 60;
+    }
+    
     let contentFontSize = 13.5; // Default body text font size is 13.5px
     let MAX_CONTENT_HEIGHT = 910; // Measured dynamically inside renderPreview
     let cachedMaxContentHeight = null; // Cache to prevent layout thrashing
@@ -371,6 +383,131 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. CORE EVENT HANDLERS
     
+    // Initialize premium UI sliders with manual keyboard numeric inputs
+    function initPremiumSliders() {
+        const rangeInputs = document.querySelectorAll('input[type="range"]');
+        const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+
+        rangeInputs.forEach(slider => {
+            const parent = slider.parentElement;
+            if (!parent) return;
+
+            // 1. Create the wrapper group
+            const wrapper = document.createElement('div');
+            wrapper.className = 'premium-slider-group';
+
+            // Insert wrapper and move slider inside it
+            parent.insertBefore(wrapper, slider);
+            wrapper.appendChild(slider);
+
+            // 2. Create the number input
+            const numInput = document.createElement('input');
+            numInput.type = 'number';
+            numInput.className = 'premium-slider-number';
+            numInput.min = slider.min || '0';
+            numInput.max = slider.max || '100';
+            numInput.step = slider.step || '1';
+            numInput.value = slider.value;
+
+            // Determine the unit based on label or slider ID
+            let unit = 'px';
+            if (slider.id === 'watermark-opacity') {
+                unit = '%';
+            } else if (slider.id === 'design-topic-thick' || slider.id === 'design-border-thick' || slider.id === 'design-divider-thick') {
+                unit = 'px';
+            } else {
+                const label = parent.querySelector('label');
+                if (label && (label.textContent.includes('%') || label.innerHTML.includes('%'))) {
+                    unit = '%';
+                }
+            }
+
+            // 3. Create the number wrapper and unit badge
+            const numWrapper = document.createElement('div');
+            numWrapper.className = 'premium-number-wrapper';
+            numWrapper.appendChild(numInput);
+
+            const badge = document.createElement('span');
+            badge.className = 'premium-slider-unit';
+            badge.textContent = unit;
+            numWrapper.appendChild(badge);
+
+            wrapper.appendChild(numWrapper);
+
+            // 4. Clean up parentheses around the val span in the label
+            const valSpan = parent.querySelector('span[id$="-val"]');
+            if (valSpan) {
+                valSpan.style.display = 'none'; // Hide the val span
+                const label = parent.querySelector('label');
+                if (label) {
+                    label.childNodes.forEach(node => {
+                        if (node.nodeType === Node.TEXT_NODE) {
+                            // Remove opening parenthesis before hidden span
+                            node.textContent = node.textContent.replace(/\s*\(\s*$/g, '');
+                            // Remove closing parenthesis after hidden span
+                            node.textContent = node.textContent.replace(/^\s*\)\s*/g, '');
+                        }
+                    });
+                }
+            }
+
+            // 5. Two-way data binding
+            // A. Slider input event (updates number input)
+            slider.addEventListener('input', () => {
+                numInput.value = slider.value;
+            });
+
+            // B. Number input event (updates slider while typing valid inputs)
+            numInput.addEventListener('input', () => {
+                let val = parseFloat(numInput.value);
+                if (isNaN(val)) return;
+
+                const min = parseFloat(slider.min || '0');
+                const max = parseFloat(slider.max || '100');
+
+                // Only update the slider if it's within the valid range
+                if (val >= min && val <= max) {
+                    descriptor.set.call(slider, val);
+                    slider.dispatchEvent(new Event('input'));
+                }
+            });
+
+            // C. Number input change/blur event (clamps value and updates slider)
+            numInput.addEventListener('change', () => {
+                let val = parseFloat(numInput.value);
+                const min = parseFloat(slider.min || '0');
+                const max = parseFloat(slider.max || '100');
+
+                if (isNaN(val)) {
+                    val = parseFloat(slider.value);
+                } else if (val < min) {
+                    val = min;
+                } else if (val > max) {
+                    val = max;
+                }
+
+                numInput.value = val;
+                descriptor.set.call(slider, val);
+                slider.dispatchEvent(new Event('input'));
+            });
+
+            // 6. Redefine value property on slider to keep number input in sync when set via code
+            Object.defineProperty(slider, 'value', {
+                get: function() {
+                    return descriptor.get.call(this);
+                },
+                set: function(val) {
+                    descriptor.set.call(this, val);
+                    numInput.value = val;
+                },
+                configurable: true
+            });
+        });
+    }
+
+    // Call premium sliders initialization
+    initPremiumSliders();
+
     // 3.0 SIDEBAR HORIZONTAL TAB CONTROLLERS
     sidebarTabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -411,12 +548,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function debouncedRenderAndSaveTyping() {
         clearTimeout(typingTimeout);
         typingTimeout = setTimeout(() => {
+            renderPreview();
             saveWorkspaceToLocalStorage();
-        }, 800); // 800ms debounce specifically for typing to save work without interrupting active editing
+        }, 800); // 800ms debounce specifically for typing to save work and render live preview
     }
 
+    let lastActiveBlockId = null;
+
     // Scroll preview to match the current line in the editor
-    function syncPreviewScroll() {
+    function syncPreviewScroll(forceScroll = false) {
         if (activePageIndex <= 0 || activePageIndex >= pagesData.length || !currentRenderedBlocks || !currentRenderedBlocks.length) return;
 
         // Get active cursor line
@@ -439,14 +579,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Find the preview element
             const previewElement = pagesContainer.querySelector(`[data-block-id="${matchedBlock.id}"]`);
             if (previewElement) {
-                // Scroll the block into the center of the preview viewport
-                previewElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const activeBlockChanged = (lastActiveBlockId !== matchedBlock.id);
+                lastActiveBlockId = matchedBlock.id;
 
                 // Highlight active block visually in preview
                 document.querySelectorAll('.active-block-highlight').forEach(el => {
                     el.classList.remove('active-block-highlight');
                 });
                 previewElement.classList.add('active-block-highlight');
+
+                // Scroll the block into the center of the preview viewport only if forced or the block changed
+                if (forceScroll || activeBlockChanged) {
+                    previewElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         }
     }
@@ -459,13 +604,13 @@ document.addEventListener('DOMContentLoaded', () => {
             debouncedRenderAndSaveTyping();
             
             // Sync scroll on input with a slight timeout to wait for DOM parsing
-            setTimeout(syncPreviewScroll, 50);
+            setTimeout(() => syncPreviewScroll(false), 50);
         }
     });
 
     // Also sync scroll when cursor selection/click changes
     ['keyup', 'click', 'focus'].forEach(evtType => {
-        pageContentInput.addEventListener(evtType, syncPreviewScroll);
+        pageContentInput.addEventListener(evtType, () => syncPreviewScroll(false));
     });
 
     // Live update when editing cover metadata
@@ -558,7 +703,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Show modal
                 imageModal.classList.add('active');
             } else {
-                alert('Photos ko aap sirf content pages me hi insert kar sakte hain!');
+                alert('Photos can only be inserted into content pages!');
             }
         });
 
@@ -695,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Show modal
                 tableModal.classList.add('active');
             } else {
-                alert('Table ko aap sirf content pages me hi insert kar sakte hain!');
+                alert('Tables can only be inserted into content pages!');
             }
         });
 
@@ -807,7 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const file3 = compilerFile3.files[0];
 
             if (!file1 || !file2) {
-                alert('Part 1 aur Part 2 dono files select karna zaroori hai!');
+                alert('Please select both Part 1 and Part 2 files to compile!');
                 return;
             }
 
@@ -820,10 +965,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             const state = JSON.parse(e.target.result);
                             resolve(state);
                         } catch (err) {
-                            reject(new Error(`File "${file.name}" read karne me error: ${err.message}`));
+                            reject(new Error(`Error reading file "${file.name}": ${err.message}`));
                         }
                     };
-                    reader.onerror = () => reject(new Error(`File "${file.name}" loading issue.`));
+                    reader.onerror = () => reject(new Error(`Issue loading file "${file.name}".`));
                     reader.readAsText(file);
                 });
             };
@@ -846,7 +991,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     compileAndMergeMagazines(fileStates, newMeta);
                     hideCompilerModal();
-                    alert('Magazines smart-merge ho gayi hain aur monthly edition load ho chuka hai! (मासिक मैगज़ीन सफलतापूर्वक मर्ज हो गई है!)');
+                    alert('Magazines have been smart-merged and the monthly edition is loaded successfully!');
                 })
                 .catch((err) => {
                     alert(err.message);
@@ -1072,27 +1217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Sync Preview manual button click listener
-    const syncPreviewBtn = document.getElementById('sync-preview-btn');
-    if (syncPreviewBtn) {
-        syncPreviewBtn.addEventListener('click', () => {
-            // Flash button visually to indicate refresh action
-            syncPreviewBtn.style.transform = 'scale(0.9)';
-            setTimeout(() => { syncPreviewBtn.style.transform = 'none'; }, 100);
-            
-            // Set flag to force refocusing the editor textarea and capturing the cursor position
-            window.forceFocusEditor = true;
-            
-            // Force save current inputs
-            saveCurrentInputState();
-            
-            // Render the preview
-            renderPreview();
-            saveWorkspaceToLocalStorage();
-            
-            window.forceFocusEditor = false;
-        });
-    }
+
 
     // Floating Action Button (FAB) Menu logic
     const editorFabContainer = document.getElementById('editor-fab-container');
@@ -1131,7 +1256,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pageTemplateSelect) {
         pageTemplateSelect.addEventListener('change', () => {
             if (activePageIndex === 0 || activePageIndex === pagesData.length) {
-                alert('Templates को आप केवल कंटेंट पेजों (Page 2, Page 3...) पर ही लागू कर सकते हैं!');
+                alert('Templates can only be applied to content pages (Page 2, Page 3...)!');
                 pageTemplateSelect.value = '';
                 return;
             }
@@ -1139,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedTemplate = pageTemplateSelect.value;
             if (!selectedTemplate) return;
             
-            if (confirm("क्या आप इस पेज के वर्तमान लेख को चुने गए टेम्पलेट से बदलना चाहते हैं? (यह क्रिया पुरानी लिखावट मिटा देगी)")) {
+            if (confirm("Are you sure you want to replace this page's content with the selected template? (This will overwrite your existing text)")) {
                 let templateText = "";
                 switch(selectedTemplate) {
                     case "standard":
@@ -1183,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (applyLayoutAllBtn) {
         applyLayoutAllBtn.addEventListener('click', () => {
             const activeLayout = pageLayoutSelect.value;
-            if (confirm(`Kya aap sach me sabhi pages ka layout "${activeLayout === 'two-column' ? 'Two Columns' : 'Single Column'}" karna chahte hain?`)) {
+            if (confirm(`Are you sure you want to set the layout for all pages to "${activeLayout === 'two-column' ? 'Two Columns' : 'Single Column'}"?`)) {
                 pagesData.forEach((page, index) => {
                     if (index > 0) { // Skip Cover page
                         page.layout = activeLayout;
@@ -1191,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 renderPreview();
                 saveWorkspaceToLocalStorage();
-                alert(`Layout applied to all pages! (सभी पेजों पर "${activeLayout === 'two-column' ? 'दो कॉलम' : 'एक कॉलम'}" लेआउट लागू कर दिया गया है!)`);
+                alert(`Layout applied to all pages successfully!`);
             }
         });
     }
@@ -1251,7 +1376,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         // Validate basic shape
                         if (!state.pagesData || !Array.isArray(state.pagesData) || state.pagesData.length === 0) {
-                            alert("Afsos! Ye valid Samyak project file (.raaz) nahi hai.");
+                            alert("Invalid file! This is not a valid Samyak project file (.raaz).");
                             return;
                         }
 
@@ -1335,7 +1460,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         saveWorkspaceToLocalStorage();
                         renderPreview();
                         
-                        alert("Project successfully loaded! (फ़ाइल सफलतापूर्वक लोड हो गई है!)");
+                        alert("Project successfully loaded!");
                     } catch (err) {
                         console.error("Import error:", err);
                         alert("Error reading project file. Code: " + err.message);
@@ -1465,7 +1590,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (clearAllBtn) {
         clearAllBtn.addEventListener('click', () => {
-            if (confirm("Kya aap sach me saare content pages ka text aur settings saaf karna chahte hain?")) {
+            if (confirm("Are you sure you want to clear all content pages, text, and settings? This cannot be undone.")) {
                 clearWorkspaceContent();
             }
         });
@@ -1477,7 +1602,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const originalPageCount = pagesData.length;
             
             if (originalPageCount <= 2) {
-                alert("Smart Shrink tab tab hi kaam karega jab aapke paas multiple pages hon!");
+                alert("Smart Shrink only works when you have multiple pages!");
                 return;
             }
 
@@ -1489,7 +1614,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const lineCount = lastPageText.split('\n').filter(l => l.trim()).length;
 
             if (characterCount > 600 || lineCount > 6) {
-                const proceed = confirm(`Aakhiri page par content thoda zyada hai (${lineCount} lines, ${characterCount} chars). Ise pichle page me fit karne ke liye text ka size kaafi chhota karna pad sakta hai. Kya aap fir bhi koshish karna chahte hain?`);
+                const proceed = confirm(`The last page contains a lot of content (${lineCount} lines, ${characterCount} chars). Fitting this on previous pages might require making the text size significantly smaller. Do you still want to proceed?`);
                 if (!proceed) return;
             }
 
@@ -1563,7 +1688,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cleanTempOptions(globalLineSpacingSelect, bestLs);
                 renderPreview();
                 saveWorkspaceToLocalStorage();
-                alert(`🪄 Smart Shrink Kamyab rha!\n\nPages: ${originalPageCount} -> ${pagesData.length}\nFont Size: ${bestFs}px\nLine Spacing: ${bestLs}`);
+                alert(`🪄 Smart Shrink was successful!\n\nPages: ${originalPageCount} -> ${pagesData.length}\nFont Size: ${bestFs}px\nLine Spacing: ${bestLs}`);
             } else {
                 // Restore original settings
                 contentFontSize = originalFontSize;
@@ -1576,7 +1701,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cachedMaxContentHeight = null;
                 
                 renderPreview();
-                alert("Koshish ki gayi, lekin font size ko 11px se chhota kiye bina pichle page me fit karna mumkin nahi ho saka.");
+                alert("Attempted, but could not fit the content onto the previous pages without shrinking the font size below 11px.");
             }
         });
     }
@@ -1601,27 +1726,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // Double-Ctrl press — Preview Refresh shortcut
-    // 300ms ke andar 2 baar Ctrl dabane par refresh trigger hoga
-    let lastCtrlPressTime = 0;
     window.addEventListener('keydown', (e) => {
         // Intercept Ctrl+P for print
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
             e.preventDefault();
             printPdfBtn.click();
-        }
-
-        // Double-Ctrl detection: only fire on the bare Ctrl key itself (not Ctrl+something)
-        if (e.key === 'Control' && !e.altKey && !e.shiftKey) {
-            const now = Date.now();
-            if (now - lastCtrlPressTime < 300) {
-                // Double Ctrl detected — trigger refresh
-                const syncBtn = document.getElementById('sync-preview-btn');
-                if (syncBtn) syncBtn.click();
-                lastCtrlPressTime = 0; // reset so triple press doesn't re-fire
-            } else {
-                lastCtrlPressTime = now;
-            }
         }
     });
 
@@ -1699,6 +1808,34 @@ document.addEventListener('DOMContentLoaded', () => {
     zoomOutBtn.addEventListener('click', () => {
         if (zoomLevel > 40) {
             zoomLevel -= 5;
+            updateZoom();
+        }
+    });
+
+    // Mobile Preview Drawer Toggle Listeners
+    if (mobilePreviewToggleBtn) {
+        mobilePreviewToggleBtn.addEventListener('click', () => {
+            if (previewPanel) {
+                previewPanel.classList.add('drawer-open');
+                document.body.classList.add('mobile-drawer-active');
+            }
+        });
+    }
+
+    if (mobilePreviewCloseBtn) {
+        mobilePreviewCloseBtn.addEventListener('click', () => {
+            if (previewPanel) {
+                previewPanel.classList.remove('drawer-open');
+                document.body.classList.remove('mobile-drawer-active');
+            }
+        });
+    }
+
+    // Auto-fit page zoom when rotating or resizing on mobile
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768) {
+            let optimalZoom = Math.floor((window.innerWidth - 32) / 794 * 100);
+            zoomLevel = Math.max(35, Math.min(optimalZoom, 60));
             updateZoom();
         }
     });
@@ -2273,7 +2410,7 @@ document.addEventListener('DOMContentLoaded', () => {
             coverEditorZone.classList.add('active');
             contentEditorZone.classList.remove('active');
             lastEditorZone.classList.remove('active');
-            activePageLabel.textContent = "Editing: Cover Page";
+            activePageLabel.textContent = "Cover";
             
             if (pageTemplateSelect) pageTemplateSelect.disabled = true;
             if (pageLayoutSelect) pageLayoutSelect.disabled = true;
@@ -2289,7 +2426,7 @@ document.addEventListener('DOMContentLoaded', () => {
             coverEditorZone.classList.remove('active');
             contentEditorZone.classList.remove('active');
             lastEditorZone.classList.add('active');
-            activePageLabel.textContent = "Editing: End Page";
+            activePageLabel.textContent = "End";
 
             if (pageTemplateSelect) pageTemplateSelect.disabled = true;
             if (pageLayoutSelect) pageLayoutSelect.disabled = true;
@@ -2304,7 +2441,7 @@ document.addEventListener('DOMContentLoaded', () => {
             coverEditorZone.classList.remove('active');
             contentEditorZone.classList.add('active');
             lastEditorZone.classList.remove('active');
-            activePageLabel.textContent = `Editing: Page ${index}`;
+            activePageLabel.textContent = index;
             
             if (pageTemplateSelect) pageTemplateSelect.disabled = false;
             if (pageLayoutSelect) pageLayoutSelect.disabled = false;
@@ -2335,7 +2472,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 targetPageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
                 // Let syncPreviewScroll align smoothly to the active editing block
-                setTimeout(syncPreviewScroll, 80);
+                setTimeout(() => syncPreviewScroll(true), 80);
             }
         }
 
@@ -2361,21 +2498,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Delete active page
     function deleteActivePage() {
         if (activePageIndex === 0) {
-            alert('Cover Page ko delete nahi kiya ja sakta!');
+            alert('The Cover Page cannot be deleted!');
             return;
         }
 
         if (activePageIndex === pagesData.length) {
-            alert('End Page ko delete nahi kiya ja sakta!');
+            alert('The End Page cannot be deleted!');
             return;
         }
 
         if (pagesData.length <= 2) {
-            alert('Kam se kam ek Content Page hona zaroori hai!');
+            alert('At least one Content Page is required!');
             return;
         }
 
-        if (confirm(`Kya aap sach me Page ${activePageIndex} delete karna chahte hain?`)) {
+        if (confirm(`Are you sure you want to delete Page ${activePageIndex}?`)) {
             // Remove page
             pagesData.splice(activePageIndex, 1);
             
@@ -3333,6 +3470,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render right-side actual A4 pages sequentially
     function renderPreview() {
+        // Save current scroll positions of the preview canvas scroll wrapper to prevent jumping
+        const canvasWrapper = document.querySelector('.canvas-wrapper');
+        const savedScrollTop = canvasWrapper ? canvasWrapper.scrollTop : 0;
+        const savedScrollLeft = canvasWrapper ? canvasWrapper.scrollLeft : 0;
+
         // Cancel any pending debounced render since we are executing a render now
         if (typeof renderTimeout !== 'undefined' && renderTimeout !== null) {
             clearTimeout(renderTimeout);
@@ -3727,6 +3869,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // 6. Sync warning states on left page-tabs sidebar
         renderTabsList();
 
+        // Restore scroll positions of the preview canvas scroll wrapper to prevent jumping
+        if (canvasWrapper) {
+            canvasWrapper.scrollTop = savedScrollTop;
+            canvasWrapper.scrollLeft = savedScrollLeft;
+        }
+
         // 7. Sync the textarea value only if changed, and restore cursor if editor was active
         if (activePageIndex > 0 && activePageIndex < pagesData.length) {
             if (pageContentInput.value !== pagesData[activePageIndex].text) {
@@ -3735,10 +3883,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isEditorActive) {
                 pageContentInput.focus();
                 pageContentInput.setSelectionRange(cursorStart, cursorEnd);
-                // Force trigger scroll sync immediately to highlight the active block in the preview panel
-                syncPreviewScroll();
+                // Force trigger scroll sync immediately to highlight the active block in the preview panel without jumping
+                syncPreviewScroll(false);
             }
-            activePageLabel.textContent = `Editing: Page ${activePageIndex}`;
+            activePageLabel.textContent = activePageIndex;
         }
     }
 
@@ -4173,13 +4321,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateStats() {
         if (activePageIndex === 0) {
-            wordCountSpan.textContent = "Words: 0";
+            wordCountSpan.textContent = "0";
             return;
         }
 
         const text = pageContentInput.value;
         const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-        wordCountSpan.textContent = `Words: ${wordCount}`;
+        wordCountSpan.textContent = wordCount;
     }
 
     // Markdown text insert/wrap helper
@@ -5470,7 +5618,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 delBtn.style.transition = 'opacity 0.2s';
                 delBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (confirm(`Kya aap sach me theme "${theme.name}" ko hide karna chahte hain?`)) {
+                    if (confirm(`Are you sure you want to hide the theme "${theme.name}"?`)) {
                         deletedThemeList.push(theme.value);
                         saveDeletedThemes();
                         renderDropdownList(searchInput.value);
