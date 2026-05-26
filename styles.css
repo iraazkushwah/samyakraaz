@@ -5026,7 +5026,7 @@ body.theme-zen-compact .toc-header {
 
 .custom-theme-dropdown-panel {
     position: absolute;
-    top: 48px; /* Float exactly below the bottom border of the header */
+    top: 100%; /* Float exactly below the bottom border of the header */
     left: 12px; /* Align with left padding of the header */
     right: 12px; /* Align with right padding of the header */
     width: auto; /* Dynamically span the full available width of the sidebar! */
@@ -5924,6 +5924,40 @@ body.theme-raaz-compact .page-content p.body-text {
         border-right: none !important;
     }
 
+    /* Redesign editor header on mobile: 2-row layout */
+    .editor-header {
+        display: grid !important;
+        grid-template-columns: 1fr auto !important;
+        grid-template-rows: auto auto !important;
+        row-gap: 8px !important;
+        column-gap: 12px !important;
+        padding: 10px 12px !important;
+    }
+
+    .logo-area {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        justify-self: start !important;
+    }
+
+    .author-credit {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        justify-self: end !important;
+        padding-right: 0 !important;
+    }
+
+    .header-global-actions {
+        grid-column: 1 / span 2 !important;
+        grid-row: 2 !important;
+        justify-self: center !important;
+        width: 100% !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding-top: 4px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.04) !important;
+    }
+
     /* Format A4 preview panel as a slide-over drawer */
     .preview-panel {
         position: fixed !important;
@@ -5931,6 +5965,7 @@ body.theme-raaz-compact .page-content p.body-text {
         right: 0;
         width: 100vw !important;
         height: 100vh !important;
+        height: 100dvh !important; /* Dynamic viewport height to size above keyboard/bars */
         z-index: 2500 !important;
         transform: translateX(100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -5947,8 +5982,8 @@ body.theme-raaz-compact .page-content p.body-text {
         align-items: center;
         justify-content: center;
         position: fixed;
-        bottom: 24px;
-        right: 24px;
+        bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
+        right: calc(24px + env(safe-area-inset-right, 0px)) !important;
         width: 50px !important;
         height: 50px !important;
         z-index: 1800 !important;
@@ -5986,8 +6021,8 @@ body.theme-raaz-compact .page-content p.body-text {
         align-items: center;
         justify-content: center;
         position: absolute !important;
-        bottom: 24px !important;
-        right: 24px !important;
+        bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
+        right: calc(24px + env(safe-area-inset-right, 0px)) !important;
         width: 50px !important;
         height: 50px !important;
         z-index: 2800 !important; /* Higher than preview panel contents */
