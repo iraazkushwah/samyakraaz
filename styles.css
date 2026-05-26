@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    SAMYAK - STYLING AND THEME SYSTEM (PAGE-BY-PAGE WORKSPACE)
    ========================================================================== */
 
@@ -5980,30 +5980,44 @@ body.theme-raaz-compact .page-content p.body-text {
         100% { box-shadow: 0 4px 22px rgba(245, 158, 11, 0.6); }
     }
 
-    /* Style the close button inside mobile preview panel */
+    /* Style the close button inside mobile preview panel (as a floating 3D close button at the bottom-right) */
     .mobile-preview-close-btn {
         display: flex !important;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: var(--ui-text);
-        font-size: 22px;
-        font-weight: 300;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
+        position: absolute !important;
+        bottom: 24px !important;
+        right: 24px !important;
+        width: 50px !important;
+        height: 50px !important;
+        z-index: 2800 !important; /* Higher than preview panel contents */
+        background: linear-gradient(135deg, var(--ui-danger, #ef4444) 0%, #f43f5e 100%) !important;
+        border: none !important;
+        color: white !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        font-size: 24px !important;
+        font-weight: bold !important;
         cursor: pointer;
-        transition: var(--transition-smooth);
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.45),
+                    inset 0 -2.5px 0 rgba(0,0,0,0.25),
+                    inset 0 2px 0 rgba(255,255,255,0.3) !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
         line-height: 1;
-        padding: 0;
-        margin-left: 10px;
+        margin: 0 !important;
     }
 
     .mobile-preview-close-btn:hover {
-        background-color: var(--ui-danger);
-        border-color: var(--ui-danger);
-        color: white;
+        transform: translateY(-2px) scale(1.05) !important;
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6),
+                    inset 0 -2.5px 0 rgba(0,0,0,0.25),
+                    inset 0 2px 0 rgba(255,255,255,0.3) !important;
+        color: white !important;
+        background: linear-gradient(135deg, var(--ui-danger, #ef4444) 0%, #f43f5e 100%) !important;
+    }
+
+    .mobile-preview-close-btn:active {
+        transform: translateY(1px) scale(0.95) !important;
     }
 
     .preview-header {
