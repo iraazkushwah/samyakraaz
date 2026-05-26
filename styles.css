@@ -2569,20 +2569,28 @@ strong {
         border-color: var(--primary-color) !important;
     }
     
-    body {
-        background-color: #fff !important;
-        color: #000 !important;
+    html, body {
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+        color: #000000 !important;
         overflow: visible !important;
         height: auto !important;
         width: auto !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
     .app-container {
         display: block !important;
         height: auto !important;
+        width: auto !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
-    .editor-panel, .preview-header, .floating-stats, .floating-editor-controls, .fab-container, .fab-trigger-btn, .fab-sub-btn, .resize-handle, .sidebar-toggle-btn {
+    .editor-panel, .preview-header, .floating-stats, .floating-editor-controls, .fab-container, .fab-trigger-btn, .fab-sub-btn, .resize-handle, .sidebar-toggle-btn, .mobile-preview-toggle-btn, .mobile-preview-close-btn {
         display: none !important;
     }
 
@@ -2597,6 +2605,8 @@ strong {
     
     .preview-panel {
         display: block !important;
+        position: static !important;
+        transform: none !important;
         background-color: #fff !important;
         background: none !important;
         height: auto !important;
@@ -3622,7 +3632,7 @@ body.light-mode .search-replace-panel {
 }
 
 /* Tablet, Mobile & Emulated Landscape Screen Proportional Division */
-@media (max-width: 1024px) {
+@media screen and (max-width: 1024px) {
     .editor-panel {
         /* In side-by-side mode on small screens, divide exactly 45% / 55% default */
         width: 45vw !important;
@@ -3643,7 +3653,7 @@ body.light-mode .search-replace-panel {
 }
 
 /* Position 3D button safely over the book logo icon in mobile landscape, perfectly aligned lower with the 'Kushwah' logo text baseline */
-@media (max-width: 1024px) and (orientation: landscape) {
+@media screen and (max-width: 1024px) and (orientation: landscape) {
     .floating-editor-controls {
         top: 14px !important;
         left: 4px !important;
@@ -5482,7 +5492,7 @@ body.theme-raaz-compact .page-content p.body-text {
     grid-template-columns: 1fr !important;
 }
 
-@media (min-width: 480px) {
+@media screen and (min-width: 480px) {
     .raaz-info-grid {
         grid-template-columns: 1fr 1fr !important;
     }
@@ -5911,7 +5921,7 @@ body.theme-raaz-compact .page-content p.body-text {
     display: none;
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     /* Hide resizer handle on mobile */
     .resize-handle {
         display: none !important;
